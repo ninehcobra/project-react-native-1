@@ -6,9 +6,15 @@ import { TouchableOpacity, View, Text } from "react-native";
 export default function CustomButton({
   title,
   onClick,
+  type = "default",
+  width,
+  height,
 }: {
   title?: string;
   onClick?: Function;
+  type?: "default" | "primary";
+  width?: number;
+  height?: number;
 }): React.ReactNode {
   return (
     <TouchableOpacity
@@ -20,15 +26,25 @@ export default function CustomButton({
         style={{
           paddingVertical: 12,
           paddingHorizontal: 12 * 1.6,
-          backgroundColor: Colors.highlight.highlightColor_1,
+          backgroundColor:
+            type == "default"
+              ? Colors.light.neutralColor_5
+              : Colors.highlight.highlightColor_1,
           borderRadius: 14,
           alignItems: "center",
           justifyContent: "center",
+          borderColor:
+            type == "default" ? Colors.highlight.highlightColor_1 : "",
+          borderWidth: 2,
+          width: width,
+          height: height,
         }}
       >
         <Text
           style={{
-            ...colorStyles.neutralColorLight_5,
+            ...(type != "default"
+              ? colorStyles.neutralColorLight_5
+              : colorStyles.highlightColor_1),
             ...typographyStyles.action_L,
           }}
         >
