@@ -1,9 +1,6 @@
-import Avatar from "@/components/prototyping_components/Avatar";
 import Banner from "@/components/prototyping_components/Banner";
 import { Colors } from "@/constants/Colors";
-import { colorStyles } from "@/styles/color";
-import { typographyStyles } from "@/styles/typography";
-import { View, Text, Alert } from "react-native";
+import { View } from "react-native";
 
 export default function OnBoarding() {
   return (
