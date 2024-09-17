@@ -17,6 +17,8 @@ import { Provider } from "react-redux";
 import { store } from "@/redux/store";
 import OnBoarding from "./on_boarding";
 
+import Toast from "react-native-toast-message";
+
 const Tab = createBottomTabNavigator();
 
 function HomeScreen({ navigation }: { navigation: any }) {
@@ -77,6 +79,7 @@ function App() {
           </NavigationContainer>
         </TamaguiProvider>
       </Provider>
+      <Toast />
     </SafeAreaProvider>
   );
 }
