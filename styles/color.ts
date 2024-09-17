@@ -1,7 +1,7 @@
 import { Colors } from "@/constants/Colors";
 import { StyleSheet } from "react-native";
 
-export const stylesColor = StyleSheet.create({
+export const colorStyles = StyleSheet.create({
   // Highlight
   highlightColor_1: {
     color: Colors.highlight.highlightColor_1,

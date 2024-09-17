@@ -1,21 +1,28 @@
 import Avatar from "@/components/prototyping_components/Avatar";
+import Banner from "@/components/prototyping_components/Banner";
 import { Colors } from "@/constants/Colors";
-import { stylesColor } from "@/styles/color";
+import { colorStyles } from "@/styles/color";
 import { typographyStyles } from "@/styles/typography";
-import { View, Text } from "react-native";
+import { View, Text, Alert } from "react-native";
 
 export default function OnBoarding() {
   return (
-    <View style={{ backgroundColor: Colors.light.neutralColor_5, flex: 1 }}>
-      <Text
-        style={{
-          ...stylesColor.supportErrorColor_1,
-          ...typographyStyles.heading_H3,
+    <View
+      style={{
+        backgroundColor: Colors.light.neutralColor_5,
+        flex: 1,
+        padding: 20,
+      }}
+    >
+      <Banner
+        title="Ăn sáng"
+        description="Ăn sáng là buổi ăn quan trọng nhất trong ngày phải ăn á nha"
+        imageUrl="https://th.bing.com/th/id/OIP.efATY6p5-5aINwEzOqYKFwAAAA?rs=1&pid=ImgDetMain"
+        buttonTitle="Ăn sáng"
+        onClick={() => {
+          console.log("hi");
         }}
-      >
-        OnBoarding1
-      </Text>
-      <Avatar />
+      />
     </View>
   );
 }
