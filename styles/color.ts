@@ -1,86 +1,87 @@
+import { Colors } from "@/constants/Colors";
 import { StyleSheet } from "react-native";
 
 export const stylesColor = StyleSheet.create({
   // Highlight
   highlightColor_1: {
-    color: "#006FFD",
+    color: Colors.highlight.highlightColor_1,
   },
   highlightColor_2: {
-    color: "#2897FF",
+    color: Colors.highlight.highlightColor_2,
   },
   highlightColor_3: {
-    color: "#6FBAFF",
+    color: Colors.highlight.highlightColor_3,
   },
   highlightColor_4: {
-    color: "#B4DBFF",
+    color: Colors.highlight.highlightColor_4,
   },
   highlightColor_5: {
-    color: "#EAF2FF",
+    color: Colors.highlight.highlightColor_5,
   },
 
   // Neutral
   // Light
   neutralColorLight_1: {
-    color: "#C5C6CC",
+    color: Colors.light.neutralColor_1,
   },
   neutralColorLight_2: {
-    color: "#D4D6DD",
+    color: Colors.light.neutralColor_2,
   },
   neutralColorLight_3: {
-    color: "#E8E9F1",
+    color: Colors.light.neutralColor_3,
   },
   neutralColorLight_4: {
-    color: "#F8F9FE",
+    color: Colors.light.neutralColor_4,
   },
   neutralColorLight_5: {
-    color: "#FFFFFF",
+    color: Colors.light.neutralColor_5,
   },
   // Dark
   neutralColorDark_1: {
-    color: "#1F2024",
+    color: Colors.dark.neutralColor_1,
   },
   neutralColorDark_2: {
-    color: "#2F3036",
+    color: Colors.dark.neutralColor_2,
   },
   neutralColorDark_3: {
-    color: "#494A50",
+    color: Colors.dark.neutralColor_3,
   },
   neutralColorDark_4: {
-    color: "#71727A",
+    color: Colors.dark.neutralColor_4,
   },
   neutralColorDark_5: {
-    color: "#8F9098",
+    color: Colors.dark.neutralColor_5,
   },
 
   // Support
   // Success
   supportColorSuccess_1: {
-    color: "#298267",
+    color: Colors.support.successColor_1,
   },
   supportColorSuccess_2: {
-    color: "#3AC0A0",
+    color: Colors.support.successColor_2,
   },
   supportColorSuccess_3: {
-    color: "#E7F4E8",
+    color: Colors.support.successColor_3,
   },
   // Warning
   supportWarningColor_1: {
-    color: "#E86339",
+    color: Colors.support.warningColor_1,
   },
   supportWarningColor_2: {
-    color: "#FFB37C",
+    color: Colors.support.warningColor_2,
   },
   supportWarningColor_3: {
-    color: "#FFFAE4",
+    color: Colors.support.warningColor_3,
   },
   // Error
   supportErrorColor_1: {
-    color: "#ED3241",
+    color: Colors.support.errorColor_1,
   },
   supportErrorColor_2: {
-    color: "#FF616D",
+    color: Colors.support.errorColor_2,
   },
   supportErrorColor_3: {
-    color: "#FFE2E5",
+    color: Colors.support.errorColor_3,
   },
 });
