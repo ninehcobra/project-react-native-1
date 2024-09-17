@@ -14,7 +14,8 @@ import { config } from "@tamagui/config/v3";
 import { Button } from "tamagui";
 import { Provider } from "react-redux";
 
-import store from "@/redux/store";
+import { store } from "@/redux/store";
+import OnBoarding from "./on_boarding";
 
 const Tab = createBottomTabNavigator();
 
@@ -55,7 +56,7 @@ function App() {
       <Provider store={store}>
         <TamaguiProvider config={tamaguiConfig}>
           <NavigationContainer independent={true}>
-            <Stack.Navigator initialRouteName="home">
+            <Stack.Navigator initialRouteName="on_boarding">
               <Stack.Screen
                 name="news"
                 component={NewsPage}
@@ -68,6 +69,10 @@ function App() {
                 component={HomeScreen}
                 options={{ headerShown: false }}
               />
+              <Stack.Screen
+                name="on_boarding"
+                component={OnBoarding}
+              ></Stack.Screen>
             </Stack.Navigator>
           </NavigationContainer>
         </TamaguiProvider>
