@@ -18,8 +18,8 @@ export default function CarouselItem({
   return (
     <View style={[styles.container, { width }]}>
       <Image
-        source={require("../../assets/images/on_boarding/thumbnail.png")}
-        style={[styles.image, { width, resizeMode: "contain" }]}
+        source={item.image}
+        style={[styles.image, { width, resizeMode: "cover" }]}
       ></Image>
       <View style={styles.detail}>
         <Text style={{ ...typographyStyles.heading_H1 }}>{item.title}</Text>

@@ -23,7 +23,8 @@ import {
   Poppins_400Regular,
 } from "@expo-google-fonts/poppins";
 import { useEffect } from "react";
-
+import { PaperProvider } from "react-native-paper";
+import SignInScreen from "./features/auth/presentation/sign_in_screen";
 const Tab = createBottomTabNavigator();
 
 SplashScreen.preventAutoHideAsync();
@@ -52,31 +53,37 @@ function RootLayout() {
   return (
     <SafeAreaProvider>
       {/* <Provider store={store}> */}
-      <NavigationContainer independent={true}>
-        <Stack.Navigator
-          screenOptions={{ headerShown: false }}
-          initialRouteName="on_boarding"
-        >
-          <Stack.Screen
-            name="news"
-            component={NewsPage}
-            options={({ route }) => ({
-              title: (route.params as { name?: string }).name ?? "",
-            })}
-          />
-          <Stack.Screen
-            name="home"
-            component={HomeScreen}
-            options={{ headerShown: false }}
-          />
-          <Stack.Screen
-            name="on_boarding"
-            component={OnBoarding}
-          ></Stack.Screen>
-        </Stack.Navigator>
-      </NavigationContainer>
+      <PaperProvider>
+        <NavigationContainer independent={true}>
+          <Stack.Navigator
+            screenOptions={{ headerShown: false }}
+            initialRouteName="on_boarding"
+          >
+            <Stack.Screen
+              name="news"
+              component={NewsPage}
+              options={({ route }) => ({
+                title: (route.params as { name?: string }).name ?? "",
+              })}
+            />
+            <Stack.Screen
+              name="home"
+              component={HomeScreen}
+              options={{ headerShown: false }}
+            />
+            <Stack.Screen
+              name="on_boarding"
+              component={OnBoarding}
+            ></Stack.Screen>
+            <Stack.Screen
+              name="sign_in"
+              component={SignInScreen}
+            ></Stack.Screen>
+          </Stack.Navigator>
+        </NavigationContainer>
 
-      <Toast />
+        <Toast />
+      </PaperProvider>
     </SafeAreaProvider>
   );
 }

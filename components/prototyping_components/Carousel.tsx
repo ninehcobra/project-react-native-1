@@ -14,7 +14,7 @@ import Paginator from "./Paginator";
 export interface CarouselItemData {
   key: string;
   title: string;
-  image: string;
+  image: any;
   description: string;
 }
 
