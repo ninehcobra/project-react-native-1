@@ -51,31 +51,31 @@ function RootLayout() {
   }
   return (
     <SafeAreaProvider>
-      <Provider store={store}>
-        <NavigationContainer independent={true}>
-          <Stack.Navigator
-            screenOptions={{ headerShown: false }}
-            initialRouteName="on_boarding"
-          >
-            <Stack.Screen
-              name="news"
-              component={NewsPage}
-              options={({ route }) => ({
-                title: (route.params as { name?: string }).name ?? "",
-              })}
-            />
-            <Stack.Screen
-              name="home"
-              component={HomeScreen}
-              options={{ headerShown: false }}
-            />
-            <Stack.Screen
-              name="on_boarding"
-              component={OnBoarding}
-            ></Stack.Screen>
-          </Stack.Navigator>
-        </NavigationContainer>
-      </Provider>
+      {/* <Provider store={store}> */}
+      <NavigationContainer independent={true}>
+        <Stack.Navigator
+          screenOptions={{ headerShown: false }}
+          initialRouteName="on_boarding"
+        >
+          <Stack.Screen
+            name="news"
+            component={NewsPage}
+            options={({ route }) => ({
+              title: (route.params as { name?: string }).name ?? "",
+            })}
+          />
+          <Stack.Screen
+            name="home"
+            component={HomeScreen}
+            options={{ headerShown: false }}
+          />
+          <Stack.Screen
+            name="on_boarding"
+            component={OnBoarding}
+          ></Stack.Screen>
+        </Stack.Navigator>
+      </NavigationContainer>
+
       <Toast />
     </SafeAreaProvider>
   );
