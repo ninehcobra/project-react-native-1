@@ -1,35 +1,31 @@
-import Badge from "@/components/prototyping_components/Badge";
-import Banner from "@/components/prototyping_components/Banner";
 import ContainerWrapper from "@/components/prototyping_components/ContainerWrapper";
-import Dialog from "@/components/prototyping_components/Dialog";
 import { Colors } from "@/constants/Colors";
-import { useEffect, useState } from "react";
-import { View } from "react-native";
-import Toast from "react-native-toast-message";
+import { colorStyles } from "@/styles/color";
+import { typographyStyles } from "@/styles/typography";
+import { ImageBackground, View, Text } from "react-native";
 import Icon from "react-native-vector-icons/FontAwesome";
 export default function OnBoarding({ navigation }: { navigation: any }) {
-  // navigation.setOptions({ headerShown: false });
-  const [number, setNumber] = useState<number>(0);
-  useEffect(() => {
-    const interval = setInterval(() => {
-      if (number == 100) {
-        setNumber(0);
-      } else setNumber((prevNumber) => prevNumber + 1);
-    }, 100);
-
-    return () => clearInterval(interval);
-  }, []);
-
+  // navigation.setOptions({ shownHeader: false });
   return (
     <ContainerWrapper>
-      <View
-        style={{
-          backgroundColor: Colors.light.neutralColor_5,
-          flex: 1,
-          padding: 20,
-        }}
-      >
-        <Badge number={number} size="large" icon={<Icon name="heart" />} />
+      <ImageBackground
+        style={{ flex: 1 }}
+        source={require("../assets/images/on_boarding/thumbnail.png")}
+      ></ImageBackground>
+      <View style={{ padding: 12 }}>
+        <Text style={{ ...typographyStyles.heading_H1 }}>
+          Create a prototype in just a few minutes
+        </Text>
+        <Text
+          style={{
+            marginVertical: 12,
+            ...typographyStyles.body_M,
+            ...colorStyles.neutralColorDark_3,
+          }}
+        >
+          Enjoy these pre-made components and worry only about creating the best
+          product ever.
+        </Text>
       </View>
     </ContainerWrapper>
   );

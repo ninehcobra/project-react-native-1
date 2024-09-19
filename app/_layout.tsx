@@ -15,8 +15,18 @@ import { store } from "@/redux/store";
 import OnBoarding from "./on_boarding";
 
 import Toast from "react-native-toast-message";
+import { SplashScreen } from "expo-router";
+
+import {
+  useFonts,
+  Poppins_900Black,
+  Poppins_400Regular,
+} from "@expo-google-fonts/poppins";
+import { useEffect } from "react";
 
 const Tab = createBottomTabNavigator();
+
+SplashScreen.preventAutoHideAsync();
 
 function HomeScreen({ navigation }: { navigation: any }) {
   return (
@@ -27,12 +37,26 @@ function HomeScreen({ navigation }: { navigation: any }) {
 }
 const Stack = createNativeStackNavigator();
 
-function App() {
+function RootLayout() {
+  const [loaded, error] = useFonts({ Poppins_400Regular });
+
+  useEffect(() => {
+    if (loaded || error) {
+      SplashScreen.hideAsync();
+    }
+  }, [loaded, error]);
+
+  if (!loaded && !error) {
+    return null;
+  }
   return (
     <SafeAreaProvider>
       <Provider store={store}>
         <NavigationContainer independent={true}>
-          <Stack.Navigator initialRouteName="on_boarding">
+          <Stack.Navigator
+            screenOptions={{ headerShown: false }}
+            initialRouteName="on_boarding"
+          >
             <Stack.Screen
               name="news"
               component={NewsPage}
@@ -57,4 +81,4 @@ function App() {
   );
 }
 
-export default App;
+export default RootLayout;

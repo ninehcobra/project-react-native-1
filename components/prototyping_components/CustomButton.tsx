@@ -16,6 +16,13 @@ export default function CustomButton({
   width?: number;
   height?: number;
 }): React.ReactNode {
+  const backGroundColor =
+    type == "default"
+      ? Colors.light.neutralColor_5
+      : Colors.highlight.highlightColor_1;
+
+  const borderColor =
+    type == "default" ? Colors.highlight.highlightColor_1 : backGroundColor;
   return (
     <TouchableOpacity
       onPress={() => {
@@ -26,15 +33,13 @@ export default function CustomButton({
         style={{
           paddingVertical: 12,
           paddingHorizontal: 12 * 1.6,
-          backgroundColor:
-            type == "default"
-              ? Colors.light.neutralColor_5
-              : Colors.highlight.highlightColor_1,
+          backgroundColor: backGroundColor,
+
           borderRadius: 14,
           alignItems: "center",
           justifyContent: "center",
-          borderColor:
-            type == "default" ? Colors.highlight.highlightColor_1 : "",
+          borderColor: borderColor,
+
           borderWidth: 2,
           width: width,
           height: height,
