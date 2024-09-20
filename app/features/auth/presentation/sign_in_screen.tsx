@@ -2,9 +2,12 @@ import Badge from "@/components/prototyping_components/Badge";
 import ContainerWrapper from "@/components/prototyping_components/ContainerWrapper";
 import CustomButton from "@/components/prototyping_components/CustomButton";
 import { Colors } from "@/constants/Colors";
+import { useLoginUserMutation } from "@/services/auth.service";
+import { ToastService } from "@/services/toast.service";
 import { colorStyles } from "@/styles/color";
 import { typographyStyles } from "@/styles/typography";
-import { useState } from "react";
+import { ErrorResponse } from "@/types/error";
+import { useEffect, useMemo, useState } from "react";
 import { View, Text, TouchableOpacity, ImageBackground } from "react-native";
 import { TextInput } from "react-native-paper";
 import Icon from "react-native-vector-icons/FontAwesome";
@@ -14,19 +17,102 @@ export default function SignInScreen({
 }: {
   navigation: any;
 }): React.ReactNode {
-  const [email, setEmail] = useState<string>("");
-  const [password, setPassword] = useState<string>("");
+  const [inputData, setInputData] = useState<{
+    email: string;
+    password: string;
+  }>({
+    email: "",
+    password: "",
+  });
+
   const [isPasswordVisible, setIsPasswordVisible] = useState<boolean>(false);
+  const [inputError, setInputError] = useState<{
+    email: string;
+    password: string;
+  }>({
+    email: "",
+    password: "",
+  });
+
+  const toastService = useMemo<ToastService>(
+    () => new ToastService(navigation),
+    [navigation]
+  );
 
   const togglePasswordVisibility = () => {
     setIsPasswordVisible(!isPasswordVisible);
   };
 
+  const [
+    loginUser,
+    {
+      data: dataLogin,
+      isSuccess: isLoginSuccess,
+      isError: isLoginError,
+      error: loginError,
+    },
+  ] = useLoginUserMutation();
   const handleSignIn = () => {
-    console.log("Email:", email);
-    console.log("Password:", password);
-    navigation.navigate("map");
+    if (inputData.email.trim() === "" || inputData.password.trim() === "") {
+      toastService.showError({
+        data: {
+          message: "Vui lòng nhập đầy đủ thông tin",
+        },
+      });
+      return;
+    } else {
+      loginUser({
+        email: inputData.email,
+        password: inputData.password,
+      });
+    }
   };
+
+  useEffect(() => {
+    if (isLoginSuccess) {
+      toastService.showSuccess("Đăng nhập thành công");
+    }
+    if (isLoginError) {
+      const errorResponse = loginError as ErrorResponse;
+      handleError(errorResponse);
+      toastService.showError(errorResponse);
+    }
+  }, [isLoginSuccess, isLoginError]);
+
+  const handleError = (error: ErrorResponse): void => {
+    if (error?.data?.errors) {
+      setInputError((prevInputError) => {
+        const newInputError: { email: string; password: string } = {
+          ...prevInputError,
+        };
+        const inputTypes: Array<keyof typeof newInputError> = [
+          "email",
+          "password",
+        ];
+        for (const inputType of inputTypes) {
+          if (error.data?.errors?.[inputType]) {
+            newInputError[inputType] = error.data.errors[inputType][0] || "";
+          } else {
+            newInputError[inputType] = "";
+          }
+        }
+        return newInputError;
+      });
+    }
+  };
+
+  const handleOnChangeInput = (inputType: string, value: string) => {
+    setInputData((prevInputData) => ({
+      ...prevInputData,
+      [inputType]: value,
+    }));
+
+    setInputError((prevInputError) => ({
+      ...prevInputError,
+      [inputType]: "",
+    }));
+  };
+
   return (
     <ContainerWrapper>
       <ImageBackground
@@ -37,22 +123,50 @@ export default function SignInScreen({
         <Text style={{ ...typographyStyles.heading_H1, marginBottom: 24 }}>
           Chào mừng quay trở lại!
         </Text>
+        {inputError.email !== "" ? (
+          <Text
+            style={{
+              ...typographyStyles.action_S,
+              ...colorStyles.supportErrorColor_2,
+              fontWeight: "bold",
+            }}
+          >
+            Email: {inputError.email}
+          </Text>
+        ) : (
+          ""
+        )}
         <TextInput
-          style={{ ...typographyStyles.body_M }}
+          error={inputError.email !== ""}
+          style={{ ...typographyStyles.body_M, marginBottom: 12 }}
           label="Email"
-          value={email}
-          onChangeText={(text) => setEmail(text)}
+          value={inputData.email}
+          onChangeText={(text) => handleOnChangeInput("email", text)}
           placeholder="Vui lòng nhập email của bạn"
           mode="outlined"
           activeOutlineColor={Colors.highlight.highlightColor_1}
           outlineStyle={{ borderRadius: 12 }}
         />
+        {inputError.password !== "" ? (
+          <Text
+            style={{
+              ...typographyStyles.action_S,
+              ...colorStyles.supportErrorColor_2,
+              fontWeight: "bold",
+            }}
+          >
+            Mật khẩu: {inputError.password}
+          </Text>
+        ) : (
+          ""
+        )}
         <TextInput
-          style={{ marginVertical: 12, ...typographyStyles.body_M }}
+          error={inputError.password !== ""}
+          style={{ marginBottom: 12, ...typographyStyles.body_M }}
           label="Mật khẩu"
-          value={password}
+          value={inputData.password}
           secureTextEntry={!isPasswordVisible}
-          onChangeText={(text) => setPassword(text)}
+          onChangeText={(text) => handleOnChangeInput("password", text)}
           placeholder="Vui lòng nhập email của bạn"
           mode="outlined"
           activeOutlineColor={Colors.highlight.highlightColor_1}

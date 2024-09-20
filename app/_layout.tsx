@@ -55,49 +55,50 @@ function RootLayout() {
   }
   return (
     <SafeAreaProvider>
-      {/* <Provider store={store}> */}
-      <PaperProvider>
-        <NavigationContainer independent={true}>
-          <Stack.Navigator
-            screenOptions={{ headerShown: false }}
-            initialRouteName="on_boarding"
-          >
-            <Stack.Screen
-              name="news"
-              component={NewsPage}
-              options={({ route }) => ({
-                title: (route.params as { name?: string }).name ?? "",
-              })}
-            />
-            <Stack.Screen
-              name="home"
-              component={HomeScreen}
-              options={{ headerShown: false }}
-            />
-            <Stack.Screen
-              name="on_boarding"
-              component={OnBoarding}
-            ></Stack.Screen>
-            <Stack.Screen
-              name="sign_in"
-              component={SignInScreen}
-            ></Stack.Screen>
-            <Stack.Screen
-              name="sign_up"
-              component={SignUpScreen}
-            ></Stack.Screen>
+      <Provider store={store}>
+        <PaperProvider>
+          <NavigationContainer independent={true}>
+            <Stack.Navigator
+              screenOptions={{ headerShown: false }}
+              initialRouteName="on_boarding"
+            >
+              <Stack.Screen
+                name="news"
+                component={NewsPage}
+                options={({ route }) => ({
+                  title: (route.params as { name?: string }).name ?? "",
+                })}
+              />
+              <Stack.Screen
+                name="home"
+                component={HomeScreen}
+                options={{ headerShown: false }}
+              />
+              <Stack.Screen
+                name="on_boarding"
+                component={OnBoarding}
+              ></Stack.Screen>
+              <Stack.Screen
+                name="sign_in"
+                component={SignInScreen}
+              ></Stack.Screen>
+              <Stack.Screen
+                name="sign_up"
+                component={SignUpScreen}
+              ></Stack.Screen>
 
-            <Stack.Screen
-              name="otp_screen"
-              component={OtpScreen}
-            ></Stack.Screen>
+              <Stack.Screen
+                name="otp_screen"
+                component={OtpScreen}
+              ></Stack.Screen>
 
-            <Stack.Screen name="map" component={Map}></Stack.Screen>
-          </Stack.Navigator>
-        </NavigationContainer>
+              <Stack.Screen name="map" component={Map}></Stack.Screen>
+            </Stack.Navigator>
+          </NavigationContainer>
 
-        <Toast />
-      </PaperProvider>
+          <Toast />
+        </PaperProvider>
+      </Provider>
     </SafeAreaProvider>
   );
 }

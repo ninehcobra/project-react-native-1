@@ -19,6 +19,7 @@ export default function SignUpScreen({
   const [email, setEmail] = useState<string>("");
   const [password, setPassword] = useState<string>("");
   const [confirmPassword, setConfirmPassword] = useState<string>("");
+  const [phone, setPhone] = useState<string>("");
 
   //   handle change data
   const handleOnChangeInput = (data: string, type: string) => {
@@ -35,6 +36,8 @@ export default function SignUpScreen({
       case "confirmPassword":
         setConfirmPassword(data);
         break;
+      case "phone":
+        setPhone(data);
       default:
         break;
     }
@@ -55,12 +58,15 @@ export default function SignUpScreen({
   //   handle sign up
   const handleSignUp = () => {
     console.log("Email:", email);
+    console.log("Name:", name);
     console.log("Password:", password);
+    console.log("Confirm Password:", confirmPassword);
+
     navigation.navigate("otp_screen");
   };
 
   //   handle checkbox
-  const [checked, setChecked] = useState("first");
+  const [checked, setChecked] = useState("second");
   return (
     <ContainerWrapper>
       <View style={{ padding: 12 }}>
@@ -107,6 +113,19 @@ export default function SignUpScreen({
           outlineStyle={{ borderRadius: 12 }}
         />
         <Text style={{ ...typographyStyles.heading_H3, marginBottom: 12 }}>
+          Số điện thoại
+        </Text>
+        <TextInput
+          style={{ ...typographyStyles.body_M, marginBottom: 12 }}
+          value={phone}
+          onChangeText={(text) => handleOnChangeInput(text, "phone")}
+          placeholder="Vui lòng nhập số điện thoại của bạn"
+          mode="outlined"
+          activeOutlineColor={Colors.highlight.highlightColor_1}
+          outlineStyle={{ borderRadius: 12 }}
+          keyboardType="numeric"
+        />
+        <Text style={{ ...typographyStyles.heading_H3, marginBottom: 12 }}>
           Mật khẩu
         </Text>
         <TextInput
@@ -145,7 +164,7 @@ export default function SignUpScreen({
           style={{
             flexDirection: "row",
             alignItems: "center",
-            marginBottom: 48,
+            marginBottom: 24,
           }}
         >
           <RadioButton
@@ -178,7 +197,7 @@ export default function SignUpScreen({
         <View
           style={{
             ...typographyStyles.body_M,
-            marginVertical: 12,
+            marginTop: 12,
             ...colorStyles.neutralColorDark_3,
             flexDirection: "row",
             justifyContent: "center",
@@ -194,7 +213,7 @@ export default function SignUpScreen({
           </TouchableOpacity>
         </View>
       </View>
-      <View style={{ marginTop: 24, alignItems: "center" }}>
+      <View style={{ marginTop: 12, alignItems: "center" }}>
         <Text
           style={{
             ...typographyStyles.body_M,

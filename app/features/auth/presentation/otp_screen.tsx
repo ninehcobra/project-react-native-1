@@ -1,8 +1,9 @@
 import ContainerWrapper from "@/components/prototyping_components/ContainerWrapper";
 import CustomButton from "@/components/prototyping_components/CustomButton";
+import { ToastService } from "@/services/toast.service";
 import { colorStyles } from "@/styles/color";
 import { typographyStyles } from "@/styles/typography";
-import React from "react";
+import React, { useMemo } from "react";
 import { View, Text, TouchableOpacity } from "react-native";
 import { TextInput } from "react-native-paper";
 
@@ -16,7 +17,12 @@ export default function OtpScreen({
   const input3Ref = React.useRef(null);
   const input4Ref = React.useRef(null);
 
-  const [otp, setOtp] = React.useState(["", "", "", ""]);
+  const [otp, setOtp] = React.useState(["", "", "", "", "", ""]);
+
+  const toastService = useMemo<ToastService>(
+    () => new ToastService(navigation),
+    [navigation]
+  );
 
   const handleOtpChange = (value: string, index: number) => {
     const newOtp = [...otp];
@@ -31,10 +37,8 @@ export default function OtpScreen({
 
   const handleOtpSubmit = () => {
     const otpValue = otp.join("");
-    console.log("OTP:", otpValue);
-    if (otpValue.length === 4) {
-      // Xử lý OTP ở đây
-      navigation.navigate();
+    toastService.showWarning("Vui lòng nhập đầy đủ thông tin trước");
+    if (otpValue.length === 6) {
     }
   };
 
@@ -54,7 +58,7 @@ export default function OtpScreen({
                 ...colorStyles.neutralColorDark_3,
               }}
             >
-              Một mã 4 số đã được gửi đến
+              Một mã 6 số đã được gửi đến
             </Text>
             <Text
               style={{
@@ -76,7 +80,6 @@ export default function OtpScreen({
               outlineStyle={{ borderRadius: 12 }}
               maxLength={1}
               textAlign="center"
-              keyboardType="number-pad"
             />
             <TextInput
               ref={input1Ref}
@@ -87,7 +90,6 @@ export default function OtpScreen({
               outlineStyle={{ borderRadius: 12 }}
               maxLength={1}
               textAlign="center"
-              keyboardType="number-pad"
             />
             <TextInput
               ref={input1Ref}
@@ -98,7 +100,6 @@ export default function OtpScreen({
               outlineStyle={{ borderRadius: 12 }}
               maxLength={1}
               textAlign="center"
-              keyboardType="number-pad"
             />
             <TextInput
               ref={input1Ref}
@@ -109,7 +110,23 @@ export default function OtpScreen({
               outlineStyle={{ borderRadius: 12 }}
               maxLength={1}
               textAlign="center"
-              keyboardType="number-pad"
+            />
+            <TextInput
+              value={otp[4]}
+              onChangeText={(value) => handleOtpChange(value, 4)}
+              mode="outlined"
+              outlineStyle={{ borderRadius: 12 }}
+              maxLength={1}
+              textAlign="center"
+            />
+            <TextInput
+              value={otp[5]}
+              onChangeText={(value) => handleOtpChange(value, 5)}
+              mode="outlined"
+              style={{ height: 56, width: 56, paddingLeft: 8 }}
+              outlineStyle={{ borderRadius: 12 }}
+              maxLength={1}
+              textAlign="center"
             />
           </View>
         </View>
