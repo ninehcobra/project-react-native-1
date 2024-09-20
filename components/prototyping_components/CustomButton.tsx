@@ -50,7 +50,8 @@ export default function CustomButton({
             ...(type != "default"
               ? colorStyles.neutralColorLight_5
               : colorStyles.highlightColor_1),
-            ...typographyStyles.action_L,
+            ...typographyStyles.body_L,
+            fontWeight: "bold",
           }}
         >
           {title ?? "Button"}

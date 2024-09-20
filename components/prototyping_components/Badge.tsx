@@ -1,5 +1,5 @@
 import { Colors } from "@/constants/Colors";
-import { Text, View } from "react-native";
+import { Text, TouchableOpacity, View } from "react-native";
 import { IconProps } from "react-native-vector-icons/Icon";
 
 export default function Badge({
@@ -8,12 +8,16 @@ export default function Badge({
   color,
   number,
   icon,
+  isTouchable = false,
+  onPress,
 }: {
   size?: "small" | "medium" | "large";
   backgroundColor?: string;
   color?: string;
   number?: number;
   icon?: React.ReactNode;
+  isTouchable?: boolean;
+  onPress?: () => void;
 }): React.ReactNode {
   const sizeSmall = 20;
   const sizeMedium = 30;
@@ -33,34 +37,44 @@ export default function Badge({
     if (num > 99) return "99+";
     return num.toString();
   }
-  return (
-    <View
-      style={{
-        backgroundColor:
-          backgroundColor != null
-            ? backgroundColor
-            : Colors.highlight.highlightColor_1,
-        height: badgeSize,
-        width: badgeSize,
-        borderRadius: badgeSize,
-        alignItems: "center",
-        justifyContent: "center",
-      }}
-    >
-      {icon != null ? (
-        icon
-      ) : number != null ? (
-        <Text
-          style={{
-            fontSize: formatNumber(number) == "99+" ? fontSize * 0.8 : fontSize,
-            color: color != null ? color : Colors.light.neutralColor_5,
-          }}
-        >
-          {formatNumber(number)}
-        </Text>
-      ) : (
-        ""
-      )}
-    </View>
+
+  const badgeDetail = (): React.ReactNode => {
+    return (
+      <View
+        style={{
+          backgroundColor:
+            backgroundColor != null
+              ? backgroundColor
+              : Colors.highlight.highlightColor_1,
+          height: badgeSize,
+          width: badgeSize,
+          borderRadius: badgeSize,
+          alignItems: "center",
+          justifyContent: "center",
+        }}
+      >
+        {icon != null ? (
+          icon
+        ) : number != null ? (
+          <Text
+            style={{
+              fontSize:
+                formatNumber(number) == "99+" ? fontSize * 0.8 : fontSize,
+              color: color != null ? color : Colors.light.neutralColor_5,
+            }}
+          >
+            {formatNumber(number)}
+          </Text>
+        ) : (
+          ""
+        )}
+      </View>
+    );
+  };
+
+  return !isTouchable ? (
+    badgeDetail()
+  ) : (
+    <TouchableOpacity onPress={onPress}>{badgeDetail()}</TouchableOpacity>
   );
 }

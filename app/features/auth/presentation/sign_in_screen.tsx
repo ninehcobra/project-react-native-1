@@ -9,9 +9,24 @@ import { View, Text, TouchableOpacity, ImageBackground } from "react-native";
 import { TextInput } from "react-native-paper";
 import Icon from "react-native-vector-icons/FontAwesome";
 
-export default function SignInScreen(): React.ReactNode {
+export default function SignInScreen({
+  navigation,
+}: {
+  navigation: any;
+}): React.ReactNode {
   const [email, setEmail] = useState<string>("");
   const [password, setPassword] = useState<string>("");
+  const [isPasswordVisible, setIsPasswordVisible] = useState<boolean>(false);
+
+  const togglePasswordVisibility = () => {
+    setIsPasswordVisible(!isPasswordVisible);
+  };
+
+  const handleSignIn = () => {
+    console.log("Email:", email);
+    console.log("Password:", password);
+    navigation.navigate("map");
+  };
   return (
     <ContainerWrapper>
       <ImageBackground
@@ -20,7 +35,7 @@ export default function SignInScreen(): React.ReactNode {
       ></ImageBackground>
       <View style={{ padding: 12 }}>
         <Text style={{ ...typographyStyles.heading_H1, marginBottom: 24 }}>
-          Welcome!
+          Chào mừng quay trở lại!
         </Text>
         <TextInput
           style={{ ...typographyStyles.body_M }}
@@ -36,12 +51,18 @@ export default function SignInScreen(): React.ReactNode {
           style={{ marginVertical: 12, ...typographyStyles.body_M }}
           label="Mật khẩu"
           value={password}
+          secureTextEntry={!isPasswordVisible}
           onChangeText={(text) => setPassword(text)}
           placeholder="Vui lòng nhập email của bạn"
           mode="outlined"
           activeOutlineColor={Colors.highlight.highlightColor_1}
           outlineStyle={{ borderRadius: 12 }}
-          right={<Icon name="bullseye" color={Colors.dark.neutralColor_1} />}
+          right={
+            <TextInput.Icon
+              onPress={togglePasswordVisibility}
+              icon={!isPasswordVisible ? "eye" : "eye-off"}
+            />
+          }
         />
         <TouchableOpacity>
           <Text
@@ -54,7 +75,7 @@ export default function SignInScreen(): React.ReactNode {
             Quên mật khẩu?
           </Text>
         </TouchableOpacity>
-        <CustomButton title="Đăng nhập" type="primary" />
+        <CustomButton onClick={handleSignIn} title="Đăng nhập" type="primary" />
         <View
           style={{
             ...typographyStyles.body_M,
@@ -65,7 +86,11 @@ export default function SignInScreen(): React.ReactNode {
           }}
         >
           <Text>Chưa có tài khoản? </Text>
-          <TouchableOpacity>
+          <TouchableOpacity
+            onPress={() => {
+              navigation.navigate("sign_up");
+            }}
+          >
             <Text
               style={{ fontWeight: "bold", ...colorStyles.highlightColor_1 }}
             >
@@ -87,6 +112,7 @@ export default function SignInScreen(): React.ReactNode {
         <View style={{ marginBottom: 24, flexDirection: "row" }}>
           <View>
             <Badge
+              isTouchable={true}
               backgroundColor={Colors.support.errorColor_1}
               size="medium"
               icon={<Icon color={Colors.light.neutralColor_5} name="google" />}
@@ -94,6 +120,7 @@ export default function SignInScreen(): React.ReactNode {
           </View>
           <View style={{ marginHorizontal: 12 }}>
             <Badge
+              isTouchable={true}
               backgroundColor={Colors.dark.neutralColor_1}
               size="medium"
               icon={<Icon color={Colors.light.neutralColor_5} name="apple" />}
@@ -101,6 +128,7 @@ export default function SignInScreen(): React.ReactNode {
           </View>
           <View>
             <Badge
+              isTouchable={true}
               backgroundColor={Colors.highlight.highlightColor_1}
               size="medium"
               icon={
