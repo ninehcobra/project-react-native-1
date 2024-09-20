@@ -40,7 +40,12 @@ export const authApi = createApi({
         query: (body) => ({
           url: "/auth/sign-up",
           method: "POST",
-          body,
+          body: {
+            ...body,
+            city: "Ho Chi Minh",
+            province: "District 1",
+            country: "Vietnam",
+          },
         }),
       }
     ),

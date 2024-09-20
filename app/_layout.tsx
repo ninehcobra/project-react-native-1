@@ -74,33 +74,20 @@ function RootLayout() {
                 component={HomeScreen}
                 options={{ headerShown: false }}
               />
-              <Stack.Screen
-                name="on_boarding"
-                component={OnBoarding}
-              ></Stack.Screen>
-              <Stack.Screen
-                name="sign_in"
-                component={SignInScreen}
-              ></Stack.Screen>
-              <Stack.Screen
-                name="sign_up"
-                component={SignUpScreen}
-              ></Stack.Screen>
-
+              <Stack.Screen name="on_boarding" component={OnBoarding} />
+              <Stack.Screen name="sign_in" component={SignInScreen} />
+              <Stack.Screen name="sign_up" component={SignUpScreen} />
               <Stack.Screen
                 name="otp_screen"
-                component={OtpScreen}
-              ></Stack.Screen>
-
-              <Stack.Screen name="map" component={Map}></Stack.Screen>
+                component={OtpScreen as React.ComponentType<{}>}
+              />
+              <Stack.Screen name="map" component={Map} />
             </Stack.Navigator>
           </NavigationContainer>
-
           <Toast />
         </PaperProvider>
       </Provider>
     </SafeAreaProvider>
   );
 }
-
 export default RootLayout;

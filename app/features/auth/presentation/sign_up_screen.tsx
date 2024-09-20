@@ -2,9 +2,12 @@ import Badge from "@/components/prototyping_components/Badge";
 import ContainerWrapper from "@/components/prototyping_components/ContainerWrapper";
 import CustomButton from "@/components/prototyping_components/CustomButton";
 import { Colors } from "@/constants/Colors";
+import { useRegistrationOTPMutation } from "@/services/otp.service";
+import { ToastService } from "@/services/toast.service";
 import { colorStyles } from "@/styles/color";
 import { typographyStyles } from "@/styles/typography";
-import { useState } from "react";
+import { ErrorResponse } from "@/types/error";
+import { useEffect, useMemo, useState } from "react";
 import { View, Text, TouchableOpacity, ImageBackground } from "react-native";
 import { RadioButton, TextInput } from "react-native-paper";
 import Icon from "react-native-vector-icons/FontAwesome";
@@ -20,6 +23,12 @@ export default function SignUpScreen({
   const [password, setPassword] = useState<string>("");
   const [confirmPassword, setConfirmPassword] = useState<string>("");
   const [phone, setPhone] = useState<string>("");
+
+  // di toast service
+  const toastService = useMemo<ToastService>(
+    () => new ToastService(navigation),
+    [navigation]
+  );
 
   //   handle change data
   const handleOnChangeInput = (data: string, type: string) => {
@@ -62,11 +71,40 @@ export default function SignUpScreen({
     console.log("Password:", password);
     console.log("Confirm Password:", confirmPassword);
 
-    navigation.navigate("otp_screen");
+    GetOTP();
   };
 
   //   handle checkbox
   const [checked, setChecked] = useState("second");
+
+  // handle register OTP
+  const [
+    registrationOTP,
+    { isSuccess: isOTPSuccess, isError: isOTPError, error: otpError },
+  ] = useRegistrationOTPMutation();
+
+  const GetOTP = async (): Promise<void> => {
+    if (!email) {
+      toastService.showWarning("Vui lòng nhập email");
+      return;
+    }
+
+    await registrationOTP({
+      email: email,
+    });
+  };
+
+  useEffect(() => {
+    if (isOTPSuccess) {
+      toastService.showSuccess("OTP đã gửi đến email của bạn");
+      navigation.navigate("otp_screen", { email, password, phone, name });
+    }
+    if (isOTPError) {
+      const errorResponse = otpError as ErrorResponse;
+
+      toastService.showError(errorResponse);
+    }
+  }, [isOTPSuccess, isOTPError]);
   return (
     <ContainerWrapper>
       <View style={{ padding: 12 }}>

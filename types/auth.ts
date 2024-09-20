@@ -5,6 +5,7 @@ export interface IRegisterUserPayload {
   firstName: string;
   lastName: string;
   phoneNumber: string;
+  otp: string;
 }
 
 export interface IRegisterUserResponse {

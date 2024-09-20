@@ -71,6 +71,7 @@ export default function SignInScreen({
   useEffect(() => {
     if (isLoginSuccess) {
       toastService.showSuccess("Đăng nhập thành công");
+      navigation.navigate("map");
     }
     if (isLoginError) {
       const errorResponse = loginError as ErrorResponse;

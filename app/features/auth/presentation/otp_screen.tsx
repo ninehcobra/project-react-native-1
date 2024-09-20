@@ -1,17 +1,35 @@
 import ContainerWrapper from "@/components/prototyping_components/ContainerWrapper";
 import CustomButton from "@/components/prototyping_components/CustomButton";
+import { useRegisterUserMutation } from "@/services/auth.service";
 import { ToastService } from "@/services/toast.service";
 import { colorStyles } from "@/styles/color";
 import { typographyStyles } from "@/styles/typography";
-import React, { useMemo } from "react";
+import { ErrorResponse } from "@/types/error";
+import { RouteProp } from "@react-navigation/native";
+import React, { useEffect, useMemo } from "react";
 import { View, Text, TouchableOpacity } from "react-native";
 import { TextInput } from "react-native-paper";
 
+type RootStackParamList = {
+  otp_screen: {
+    email: string;
+    password: string;
+    phone: string;
+    name: string;
+  };
+};
+
+type OtpScreenRouteProp = RouteProp<RootStackParamList, "otp_screen">;
+
 export default function OtpScreen({
+  route,
   navigation,
 }: {
+  route: OtpScreenRouteProp;
   navigation: any;
 }): React.ReactNode {
+  const { email, password, phone, name } = route.params;
+
   const input1Ref = React.useRef(null);
   const input2Ref = React.useRef(null);
   const input3Ref = React.useRef(null);
@@ -35,12 +53,42 @@ export default function OtpScreen({
     }
   };
 
+  const [
+    registerUser,
+    {
+      data: userData,
+      isSuccess: isRegisterSuccess,
+      isError: isRegisterError,
+      error: registerError,
+    },
+  ] = useRegisterUserMutation();
   const handleOtpSubmit = () => {
     const otpValue = otp.join("");
-    toastService.showWarning("Vui lòng nhập đầy đủ thông tin trước");
+
     if (otpValue.length === 6) {
+      registerUser({
+        email: email,
+        password: password,
+        phoneNumber: phone,
+        lastName: name,
+        firstName: name,
+        otp: otpValue,
+      });
     }
   };
+
+  useEffect(() => {
+    if (isRegisterSuccess) {
+      toastService.showSuccess("Đăng ký thành công");
+      navigation.navigate("sign_in");
+    }
+    if (isRegisterError) {
+      const errorResponse = registerError as ErrorResponse;
+      console.log(registerError);
+      toastService.showError(errorResponse);
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [isRegisterSuccess, isRegisterError]);
 
   return (
     <ContainerWrapper>
@@ -66,7 +114,7 @@ export default function OtpScreen({
                 ...colorStyles.neutralColorDark_3,
               }}
             >
-              ttbexinhtt2903@gmail.com
+              {email}
             </Text>
           </View>
 
@@ -116,6 +164,7 @@ export default function OtpScreen({
               onChangeText={(value) => handleOtpChange(value, 4)}
               mode="outlined"
               outlineStyle={{ borderRadius: 12 }}
+              style={{ height: 56, width: 56, paddingLeft: 8 }}
               maxLength={1}
               textAlign="center"
             />
@@ -146,7 +195,7 @@ export default function OtpScreen({
           </View>
           <CustomButton
             onClick={() => {
-              console.log(otp);
+              handleOtpSubmit();
             }}
             title="Tiếp tục"
             type="primary"
