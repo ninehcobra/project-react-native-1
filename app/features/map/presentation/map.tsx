@@ -1,7 +1,7 @@
 import { Colors } from "@/constants/Colors";
 import { ToastService } from "@/services/toast.service";
 import { typographyStyles } from "@/styles/typography";
-import { useEffect, useMemo, useState } from "react";
+import { useEffect, useMemo, useRef, useState } from "react";
 import {
   View,
   StyleSheet,
@@ -10,9 +10,10 @@ import {
   PermissionsAndroid,
   Platform,
 } from "react-native";
-import MapView from "react-native-maps";
+import MapView, { LatLng, Marker } from "react-native-maps";
 import { TextInput } from "react-native-paper";
 import * as Location from "expo-location";
+import MaterialIcons from "@expo/vector-icons/MaterialIcons";
 
 const mapTypes = ["standard", "satellite", "hybrid", "terrain"];
 
@@ -25,6 +26,8 @@ export default function Map({
     "standard" | "satellite" | "hybrid" | "terrain"
   >("terrain");
 
+  const [currentLocation, setCurrentLocation] = useState<LatLng | null>(null);
+  const mapRef = useRef<MapView>(null);
   const cycleMapType = () => {
     const currentIndex = mapTypes.indexOf(mapType);
     const nextIndex = (currentIndex + 1) % mapTypes.length;
@@ -41,19 +44,25 @@ export default function Map({
   const requestLocationPermission = async () => {
     if (Platform.OS === "android") {
       try {
-        const granted = await PermissionsAndroid.request(
-          PermissionsAndroid.PERMISSIONS.ACCESS_FINE_LOCATION,
-          {
-            title: "Location Permission",
-            message: "App needs access to your location",
-            buttonNeutral: "Ask Me Later",
-            buttonNegative: "Cancel",
-            buttonPositive: "OK",
+        if (
+          (await PermissionsAndroid.check(
+            PermissionsAndroid.PERMISSIONS.ACCESS_FINE_LOCATION
+          )) === false
+        ) {
+          const granted = await PermissionsAndroid.request(
+            PermissionsAndroid.PERMISSIONS.ACCESS_FINE_LOCATION,
+            {
+              title: "Location Permission",
+              message: "App needs access to your location",
+              buttonNeutral: "Ask Me Later",
+              buttonNegative: "Cancel",
+              buttonPositive: "OK",
+            }
+          );
+          if (granted === PermissionsAndroid.RESULTS.GRANTED) {
+          } else {
+            toastService.showInfo("Location permission denied");
           }
-        );
-        if (granted === PermissionsAndroid.RESULTS.GRANTED) {
-        } else {
-          toastService.showInfo("Location permission denied");
         }
       } catch (err) {
         toastService.showInfo("Error requesting location permission");
@@ -62,26 +71,60 @@ export default function Map({
   };
 
   const getCurrentLocation = async () => {
-    let { status } = await Location.requestForegroundPermissionsAsync();
-    if (status !== "granted") {
-      toastService.showInfo("Permission to access location was denied");
-      return;
-    }
+    console.log("on CLick");
+    if (currentLocation == null) {
+      await requestLocationPermission();
+      let { status } = await Location.requestForegroundPermissionsAsync();
+      if (status !== "granted") {
+        toastService.showInfo("Permission to access location was denied");
+        return;
+      }
 
-    let location = await Location.getCurrentPositionAsync({});
-    console.log(location);
-    // You can update the map's region here if needed
+      let location = await Location.getCurrentPositionAsync({});
+      if (location) {
+        setCurrentLocation({
+          latitude: location.coords.latitude,
+          longitude: location.coords.longitude,
+        });
+      }
+
+      onFlyTo({
+        latitude: location.coords.latitude,
+        longitude: location.coords.longitude,
+        latitudeDelta: 0.005,
+        longitudeDelta: 0.005,
+      });
+    } else {
+      setCurrentLocation(null);
+    }
   };
 
-  useEffect(() => {
-    requestLocationPermission();
-    getCurrentLocation();
-  }, []);
+  const onFlyTo = ({
+    latitude,
+    longitude,
+    latitudeDelta,
+    longitudeDelta,
+  }: {
+    latitude: number;
+    longitude: number;
+    latitudeDelta: number;
+    longitudeDelta: number;
+  }): void => {
+    mapRef.current?.animateToRegion(
+      {
+        latitude: latitude,
+        longitude: longitude,
+        latitudeDelta: latitudeDelta,
+        longitudeDelta: longitudeDelta,
+      },
+      3000
+    );
+  };
 
   return (
     <View style={styles.container}>
       <MapView
-        userInterfaceStyle="dark"
+        ref={mapRef}
         initialRegion={{
           latitude: 10.87702,
           longitude: 106.809773,
@@ -90,7 +133,17 @@ export default function Map({
         }}
         mapType={mapType}
         style={styles.map}
-      />
+      >
+        {currentLocation != null ? (
+          <Marker
+            coordinate={currentLocation}
+            title="Current Location"
+            description="You are here"
+          />
+        ) : (
+          ""
+        )}
+      </MapView>
       <TouchableOpacity style={styles.floatingButton} onPress={cycleMapType}>
         <Text style={styles.buttonText}>
           {mapType == "terrain"
@@ -111,6 +164,21 @@ export default function Map({
           right={<TextInput.Icon icon="magnify" />}
         ></TextInput>
       </View>
+
+      <TouchableOpacity onPress={getCurrentLocation}>
+        <View style={{ ...styles.floatingLeftBtn, bottom: 20 }}>
+          <MaterialIcons
+            name={currentLocation ? "location-off" : "location-on"}
+            size={20}
+            color={Colors.support.errorColor_1}
+          />
+        </View>
+      </TouchableOpacity>
+      <TouchableOpacity>
+        <View style={{ ...styles.floatingLeftBtn, bottom: 72 }}>
+          <MaterialIcons name="search" size={20} color="black" />
+        </View>
+      </TouchableOpacity>
     </View>
   );
 }
@@ -137,9 +205,16 @@ const styles = StyleSheet.create({
   },
   searchbar: {
     position: "absolute",
-    top: 40,
+    top: 20,
     left: 0,
     width: "100%",
     padding: 12,
+  },
+  floatingLeftBtn: {
+    position: "absolute",
+    left: 20,
+    backgroundColor: Colors.light.neutralColor_5,
+    padding: 10,
+    borderRadius: 20,
   },
 });
