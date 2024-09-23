@@ -3,7 +3,7 @@ import { createApi, fetchBaseQuery } from "@reduxjs/toolkit/query/react";
 
 export const nearByApi = createApi({
   reducerPath: "nearByApi",
-  baseQuery: fetchBaseQuery({ baseUrl: "http://localhost:3333" }),
+  baseQuery: fetchBaseQuery({ baseUrl: "http://10.0.2.2:3333" }),
   tagTypes: ["NearBy"],
   endpoints: (builder) => ({
     findNearBy: builder.query<IFindNearByResponse, IFindNearByPayLoad>({
