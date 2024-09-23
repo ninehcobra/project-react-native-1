@@ -53,17 +53,25 @@ export default function SignInScreen({
     },
   ] = useLoginUserMutation();
   const handleSignIn = () => {
-    if (inputData.email.trim() === "" || inputData.password.trim() === "") {
+    try {
+      if (inputData.email.trim() === "" || inputData.password.trim() === "") {
+        toastService.showError({
+          data: {
+            message: "Vui lòng nhập đầy đủ thông tin",
+          },
+        });
+        return;
+      } else {
+        loginUser({
+          email: inputData.email,
+          password: inputData.password,
+        });
+      }
+    } catch (error) {
       toastService.showError({
         data: {
-          message: "Vui lòng nhập đầy đủ thông tin",
+          message: "Có lỗi xảy ra phía server",
         },
-      });
-      return;
-    } else {
-      loginUser({
-        email: inputData.email,
-        password: inputData.password,
       });
     }
   };

@@ -1,16 +1,29 @@
 import { Colors } from "@/constants/Colors";
+import { ToastService } from "@/services/toast.service";
 import { typographyStyles } from "@/styles/typography";
-import React, { useState } from "react";
-import { View, StyleSheet, TouchableOpacity, Text } from "react-native";
+import { useEffect, useMemo, useState } from "react";
+import {
+  View,
+  StyleSheet,
+  TouchableOpacity,
+  Text,
+  PermissionsAndroid,
+  Platform,
+} from "react-native";
 import MapView from "react-native-maps";
 import { TextInput } from "react-native-paper";
+import * as Location from "expo-location";
 
 const mapTypes = ["standard", "satellite", "hybrid", "terrain"];
 
-export default function Map(): React.ReactNode {
+export default function Map({
+  navigation,
+}: {
+  navigation: any;
+}): React.ReactNode {
   const [mapType, setMapType] = useState<
     "standard" | "satellite" | "hybrid" | "terrain"
-  >("standard");
+  >("terrain");
 
   const cycleMapType = () => {
     const currentIndex = mapTypes.indexOf(mapType);
@@ -20,9 +33,55 @@ export default function Map(): React.ReactNode {
     );
   };
 
+  const toastService = useMemo<ToastService>(
+    () => new ToastService(navigation),
+    [navigation]
+  );
+
+  const requestLocationPermission = async () => {
+    if (Platform.OS === "android") {
+      try {
+        const granted = await PermissionsAndroid.request(
+          PermissionsAndroid.PERMISSIONS.ACCESS_FINE_LOCATION,
+          {
+            title: "Location Permission",
+            message: "App needs access to your location",
+            buttonNeutral: "Ask Me Later",
+            buttonNegative: "Cancel",
+            buttonPositive: "OK",
+          }
+        );
+        if (granted === PermissionsAndroid.RESULTS.GRANTED) {
+        } else {
+          toastService.showInfo("Location permission denied");
+        }
+      } catch (err) {
+        toastService.showInfo("Error requesting location permission");
+      }
+    }
+  };
+
+  const getCurrentLocation = async () => {
+    let { status } = await Location.requestForegroundPermissionsAsync();
+    if (status !== "granted") {
+      toastService.showInfo("Permission to access location was denied");
+      return;
+    }
+
+    let location = await Location.getCurrentPositionAsync({});
+    console.log(location);
+    // You can update the map's region here if needed
+  };
+
+  useEffect(() => {
+    requestLocationPermission();
+    getCurrentLocation();
+  }, []);
+
   return (
     <View style={styles.container}>
       <MapView
+        userInterfaceStyle="dark"
         initialRegion={{
           latitude: 10.87702,
           longitude: 106.809773,
@@ -33,7 +92,15 @@ export default function Map(): React.ReactNode {
         style={styles.map}
       />
       <TouchableOpacity style={styles.floatingButton} onPress={cycleMapType}>
-        <Text style={styles.buttonText}>{mapType}</Text>
+        <Text style={styles.buttonText}>
+          {mapType == "terrain"
+            ? "Địa hình"
+            : mapType == "hybrid"
+            ? "Kết hợp"
+            : mapType == "standard"
+            ? "Cơ bản"
+            : "Vệ tinh"}
+        </Text>
       </TouchableOpacity>
       <View style={styles.searchbar}>
         <TextInput
@@ -70,7 +137,7 @@ const styles = StyleSheet.create({
   },
   searchbar: {
     position: "absolute",
-    top: 20,
+    top: 40,
     left: 0,
     width: "100%",
     padding: 12,

@@ -60,7 +60,7 @@ function RootLayout() {
           <NavigationContainer independent={true}>
             <Stack.Navigator
               screenOptions={{ headerShown: false }}
-              initialRouteName="on_boarding"
+              initialRouteName="map"
             >
               <Stack.Screen
                 name="news"
