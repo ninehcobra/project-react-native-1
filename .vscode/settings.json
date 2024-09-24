@@ -1,3 +1,4 @@
 {
-  "cSpell.words": ["Tamagui"]
+  "cSpell.words": ["Tamagui"],
+  "search.exclude": { "**/node_modules": false }
 }

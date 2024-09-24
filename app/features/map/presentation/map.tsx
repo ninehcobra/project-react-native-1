@@ -24,6 +24,8 @@ import { IBusiness } from "@/types/business";
 
 import RNPickerSelect from "react-native-picker-select";
 
+import { SvgUri } from "react-native-svg";
+
 const mapTypes = ["standard", "satellite", "hybrid", "terrain"];
 
 export default function Map({
@@ -49,27 +51,12 @@ export default function Map({
 
   const [selectedRadius, setSelectedRadius] = useState<number>(5);
 
-  const radiusOptions = [
-    { label: "500m", value: 0.5 },
-    { label: "1km", value: 1 },
-    { label: "2km", value: 2 },
-    { label: "5km", value: 5 },
-    { label: "10km", value: 10 },
-    { label: "20km", value: 20 },
-  ];
-
   const [queryData, setQueryData] = useState<IFindNearByPayLoad>({
     latitude: position[0],
     longitude: position[1],
     radius: selectedRadius,
     q: "",
   });
-
-  const showPlaceDetails = (place: any) => {
-    setSelectedPlace(place);
-    setModalVisible(true);
-  };
-
   const {
     data: searchResponse,
     isLoading,
@@ -82,6 +69,37 @@ export default function Map({
     skip: !isSearching,
   });
 
+  const radiusOptions = [
+    { label: "500m", value: 0.5 },
+    { label: "1km", value: 1 },
+    { label: "2km", value: 2 },
+    { label: "5km", value: 5 },
+    { label: "10km", value: 10 },
+    { label: "20km", value: 20 },
+  ];
+
+  const toastService = useMemo<ToastService>(
+    () => new ToastService(navigation),
+    [navigation]
+  );
+
+  useEffect(() => {
+    isSearching && refetch();
+  }, [queryData, selectedRadius]);
+
+  useEffect(() => {
+    if (isSuccess) {
+      console.log(searchResponse);
+    } else if (isError) {
+      console.log(error);
+    }
+  }, [isSuccess, isError]);
+
+  const showPlaceDetails = (place: any) => {
+    setSelectedPlace(place);
+    setModalVisible(true);
+  };
+
   const mapRef = useRef<MapView>(null);
   const cycleMapType = () => {
     const currentIndex = mapTypes.indexOf(mapType);
@@ -90,11 +108,6 @@ export default function Map({
       mapTypes[nextIndex] as "standard" | "satellite" | "hybrid" | "terrain"
     );
   };
-
-  const toastService = useMemo<ToastService>(
-    () => new ToastService(navigation),
-    [navigation]
-  );
 
   const requestLocationPermission = async () => {
     if (Platform.OS === "android") {
@@ -197,18 +210,6 @@ export default function Map({
     }
   };
 
-  useEffect(() => {
-    isSearching && refetch();
-  }, [queryData, selectedRadius]);
-
-  useEffect(() => {
-    if (isSuccess) {
-      console.log(searchResponse);
-    } else if (isError) {
-      console.log(error);
-    }
-  }, [isSuccess, isError]);
-
   return (
     <View style={styles.container}>
       <MapView
@@ -265,13 +266,7 @@ export default function Map({
             onPress={() => showPlaceDetails(place)}
             pinColor={Colors.highlight.highlightColor_1}
           >
-            {/* <Text>{place.name}</Text>
-            <SvgUri
-              key={place.id}
-              height={35}
-              width={35}
-              source={{ uri: place.category.linkURL }}
-            /> */}
+            <SvgUri width="40" height="40" uri={place.category.linkURL} />
           </Marker>
         ))}
       </MapView>
