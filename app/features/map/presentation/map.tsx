@@ -13,6 +13,7 @@ import {
   Image,
   FlatList,
   ScrollView,
+  Dimensions,
 } from "react-native";
 import MapView, { Circle, LatLng, Marker } from "react-native-maps";
 import { TextInput } from "react-native-paper";
@@ -32,6 +33,8 @@ import Ionicons from "@expo/vector-icons/Ionicons";
 import { colorStyles } from "@/styles/color";
 
 import FontAwesome6 from "@expo/vector-icons/FontAwesome6";
+
+import Carousel from "react-native-reanimated-carousel";
 
 const mapTypes = ["standard", "satellite", "hybrid", "terrain"];
 
@@ -231,7 +234,9 @@ export default function Map({
         selectedLocation.longitude,
         selectedRadius
       );
-      setSearchResult(true);
+      setTimeout(() => {
+        setSearchResult(true);
+      }, 1000);
     }
   };
 
@@ -259,6 +264,8 @@ export default function Map({
       1000
     );
   };
+
+  const width = Dimensions.get("window").width;
 
   return (
     <View style={styles.container}>
@@ -375,10 +382,32 @@ export default function Map({
           <View style={styles.modalContent}>
             {selectedPlace && (
               <>
-                <Image
-                  source={{ uri: selectedPlace.images[0].url }}
-                  style={styles.placeImage}
-                />
+                <View style={{ height: 250 }}>
+                  <Carousel
+                    loop
+                    width={width}
+                    height={250}
+                    autoPlay={true}
+                    data={[...new Array(6).keys()]}
+                    scrollAnimationDuration={1000}
+                    onSnapToItem={(index) =>
+                      console.log("current index:", index)
+                    }
+                    renderItem={({ index }) => (
+                      <View
+                        style={{
+                          flex: 1,
+                          borderWidth: 1,
+                          justifyContent: "center",
+                        }}
+                      >
+                        <Text style={{ textAlign: "center", fontSize: 30 }}>
+                          {index}
+                        </Text>
+                      </View>
+                    )}
+                  />
+                </View>
                 <Text style={styles.modalTitle}>{selectedPlace.name}</Text>
                 <Text style={styles.modalDescription}>
                   {selectedPlace.description}
@@ -848,7 +877,7 @@ const styles = StyleSheet.create({
     backgroundColor: "white",
     borderTopLeftRadius: 20,
     borderTopRightRadius: 20,
-    padding: 20,
+
     maxHeight: "80%",
     paddingTop: 0,
   },
