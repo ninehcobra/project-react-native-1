@@ -44,6 +44,8 @@ const Stack = createNativeStackNavigator();
 function RootLayout() {
   const [loaded, error] = useFonts({ Poppins_400Regular });
 
+  console.ignoredYellowBox = ["Warning: Each", "Warning: Failed"];
+
   useEffect(() => {
     if (loaded || error) {
       SplashScreen.hideAsync();

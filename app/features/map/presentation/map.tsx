@@ -11,6 +11,8 @@ import {
   Platform,
   Modal,
   Image,
+  FlatList,
+  ScrollView,
 } from "react-native";
 import MapView, { Circle, LatLng, Marker } from "react-native-maps";
 import { TextInput } from "react-native-paper";
@@ -25,6 +27,11 @@ import { IBusiness } from "@/types/business";
 import RNPickerSelect from "react-native-picker-select";
 
 import { SvgUri } from "react-native-svg";
+
+import Ionicons from "@expo/vector-icons/Ionicons";
+import { colorStyles } from "@/styles/color";
+
+import FontAwesome6 from "@expo/vector-icons/FontAwesome6";
 
 const mapTypes = ["standard", "satellite", "hybrid", "terrain"];
 
@@ -51,11 +58,14 @@ export default function Map({
 
   const [selectedRadius, setSelectedRadius] = useState<number>(5);
 
+  const [searchResult, setSearchResult] = useState<boolean>(false);
+
   const [queryData, setQueryData] = useState<IFindNearByPayLoad>({
     latitude: position[0],
     longitude: position[1],
     radius: selectedRadius,
     q: "",
+    limit: 200,
   });
   const {
     data: searchResponse,
@@ -84,7 +94,14 @@ export default function Map({
   );
 
   useEffect(() => {
-    isSearching && refetch();
+    if (isSearching && selectedLocation) {
+      updateMapRegion(
+        selectedLocation.latitude,
+        selectedLocation.longitude,
+        selectedRadius
+      );
+      refetch();
+    }
   }, [queryData, selectedRadius]);
 
   useEffect(() => {
@@ -178,6 +195,7 @@ export default function Map({
     latitudeDelta: number;
     longitudeDelta: number;
   }): void => {
+    setSearchResult(false);
     mapRef.current?.animateToRegion(
       {
         latitude: latitude,
@@ -207,7 +225,38 @@ export default function Map({
         latitude: selectedLocation.latitude,
         longitude: selectedLocation.longitude,
       });
+      updateMapRegion(
+        selectedLocation.latitude,
+        selectedLocation.longitude,
+        selectedRadius
+      );
+      setSearchResult(true);
     }
+  };
+
+  const getZoomLevel = (radius: number) => {
+    return Math.log2(360 * (40075017 / (radius * 1000 * 256))) - 1;
+  };
+
+  const updateMapRegion = (
+    latitude: number,
+    longitude: number,
+    radius: number
+  ) => {
+    const zoomLevel = getZoomLevel(radius);
+    const latDelta = (radius * 2) / 111.32;
+    const lonDelta =
+      (radius * 2) / (111.32 * Math.cos(latitude * (Math.PI / 180)));
+
+    mapRef.current?.animateToRegion(
+      {
+        latitude,
+        longitude,
+        latitudeDelta: latDelta,
+        longitudeDelta: lonDelta,
+      },
+      1000
+    );
   };
 
   return (
@@ -271,7 +320,7 @@ export default function Map({
         ))}
       </MapView>
       <TouchableOpacity
-        style={{ ...styles.floatingButton, bottom: 20, right: 20 }}
+        style={{ ...styles.floatingButton, bottom: 72, right: 20 }}
         onPress={cycleMapType}
       >
         <Text style={styles.buttonText}>
@@ -364,14 +413,347 @@ export default function Map({
             setQueryData({
               ...queryData,
               radius: value,
+              limit:
+                value == 0.5
+                  ? 20
+                  : value == 1
+                  ? 30
+                  : value == 2
+                  ? 40
+                  : value == 5
+                  ? 50
+                  : value == 10
+                  ? 100
+                  : 200,
             });
           }}
           items={radiusOptions}
           value={selectedRadius}
           style={pickerSelectStyles}
-          placeholder={{ label: "Select radius", value: null }}
+          placeholder={{ label: "Chọn bán kính", value: null }}
         />
       </View>
+
+      <Modal
+        animationType="slide"
+        transparent={true}
+        onRequestClose={() => setSearchResult(false)}
+        visible={searchResult}
+      >
+        <View style={styles.modalOverlay}>
+          <View style={styles.modalContent}>
+            <TouchableOpacity
+              style={styles.closeButton}
+              onPress={() => setModalVisible(false)}
+            >
+              <AntDesign name="close" size={24} color="white" />
+            </TouchableOpacity>
+            <View
+              style={{ width: "100%", alignItems: "center", marginVertical: 8 }}
+            >
+              <View
+                style={{
+                  height: 6,
+                  width: 60,
+                  backgroundColor: Colors.dark.neutralColor_5,
+                  borderRadius: 10,
+                  opacity: 0.5,
+                }}
+              ></View>
+            </View>
+            <Text
+              style={{
+                ...typographyStyles.heading_H1,
+                fontWeight: 600,
+                marginBottom: 12,
+              }}
+            >
+              Kết quả
+            </Text>
+
+            <View
+              style={{
+                flexDirection: "row",
+                alignItems: "center",
+                marginBottom: 12,
+              }}
+            >
+              <Ionicons
+                style={{ marginRight: 12 }}
+                name="filter-sharp"
+                size={24}
+                color="black"
+              />
+              <ScrollView
+                horizontal={true}
+                showsHorizontalScrollIndicator={false}
+              >
+                <View
+                  style={{
+                    paddingVertical: 4,
+                    paddingHorizontal: 8,
+                    borderColor: Colors.dark.neutralColor_5,
+                    borderWidth: 1,
+                    borderRadius: 10,
+                  }}
+                >
+                  <Text
+                    style={{
+                      ...typographyStyles.body_L,
+                      fontWeight: "700",
+                    }}
+                  >
+                    Hiện đang mở
+                  </Text>
+                </View>
+                <View
+                  style={{
+                    paddingVertical: 4,
+                    paddingHorizontal: 8,
+                    borderColor: Colors.dark.neutralColor_5,
+                    borderWidth: 1,
+                    borderRadius: 10,
+                    marginLeft: 12,
+                  }}
+                >
+                  <Text
+                    style={{
+                      ...typographyStyles.body_L,
+                      fontWeight: "700",
+                    }}
+                  >
+                    Được xếp hạng cao nhất
+                  </Text>
+                </View>
+                <View
+                  style={{
+                    paddingVertical: 4,
+                    paddingHorizontal: 8,
+                    borderColor: Colors.dark.neutralColor_5,
+                    borderWidth: 1,
+                    borderRadius: 10,
+                    marginLeft: 12,
+                  }}
+                >
+                  <Text
+                    style={{
+                      ...typographyStyles.body_L,
+                      fontWeight: "700",
+                    }}
+                  >
+                    Gần đây nhất
+                  </Text>
+                </View>
+              </ScrollView>
+            </View>
+            <ScrollView
+              style={{
+                marginTop: 12,
+              }}
+              showsHorizontalScrollIndicator={false}
+              showsVerticalScrollIndicator={false}
+            >
+              {searchResponse && searchResponse.data.length > 0
+                ? searchResponse.data.map((place) => (
+                    <View key={place.id} style={{ marginBottom: 24 }}>
+                      <ScrollView
+                        showsHorizontalScrollIndicator={false}
+                        horizontal={true}
+                      >
+                        {place.images.length > 0 ? (
+                          place.images.map((image) => {
+                            return (
+                              <Image
+                                source={
+                                  image.url
+                                    ? { uri: image.url }
+                                    : require("../../../../assets/images/default_business.png")
+                                }
+                                defaultSource={require("../../../../assets/images/default_business.png")}
+                                onError={(error) =>
+                                  console.log("Image loading error:", error)
+                                }
+                                style={{
+                                  borderRadius: 12,
+                                  width: 165,
+                                  height: 165,
+                                  marginRight: 12,
+                                }}
+                              />
+                            );
+                          })
+                        ) : (
+                          <Image
+                            source={require("../../../../assets/images/default_business.png")}
+                            style={{
+                              borderRadius: 12,
+                              width: 165,
+                              height: 165,
+                              marginRight: 12,
+                            }}
+                          />
+                        )}
+                      </ScrollView>
+                      <View style={{ flexDirection: "row" }}>
+                        <View style={{ marginTop: 6, flex: 9 }}>
+                          <Text
+                            style={{
+                              ...typographyStyles.body_L,
+                              fontWeight: "700",
+                            }}
+                          >
+                            {place.name}
+                          </Text>
+                          <View
+                            style={{
+                              flexDirection: "row",
+                              alignItems: "center",
+                            }}
+                          >
+                            <Text
+                              style={{
+                                ...typographyStyles.body_M,
+                                ...colorStyles.neutralColorDark_3,
+                              }}
+                            >
+                              {place.overallRating.toFixed(1)}
+                            </Text>
+
+                            <View
+                              style={{
+                                marginLeft: 4,
+                                marginBottom: 4,
+                                flexDirection: "row",
+                              }}
+                            >
+                              {[1, 2, 3, 4, 5].map((index) => {
+                                const starValue =
+                                  place.overallRating - index + 1;
+                                if (starValue >= 1) {
+                                  return (
+                                    <MaterialIcons
+                                      key={index}
+                                      name="star"
+                                      size={18}
+                                      color={Colors.support.warningColor_1}
+                                    />
+                                  );
+                                } else if (starValue > 0) {
+                                  return (
+                                    <MaterialIcons
+                                      key={index}
+                                      name="star-half"
+                                      size={18}
+                                      color={Colors.support.warningColor_1}
+                                    />
+                                  );
+                                } else {
+                                  return (
+                                    <MaterialIcons
+                                      key={index}
+                                      name="star-outline"
+                                      size={18}
+                                      color={Colors.support.warningColor_1}
+                                    />
+                                  );
+                                }
+                              })}
+                            </View>
+
+                            <Text
+                              style={{
+                                ...typographyStyles.body_M,
+                                ...colorStyles.neutralColorDark_3,
+                                marginLeft: 4,
+                              }}
+                            >{`(${place.totalReview}) . `}</Text>
+                            <Text
+                              style={{
+                                ...typographyStyles.body_M,
+                                ...colorStyles.neutralColorDark_3,
+                                marginLeft: 4,
+                              }}
+                            >{`${(place._distance / 1000).toFixed(
+                              1
+                            )} km`}</Text>
+                          </View>
+
+                          <Text
+                            style={{
+                              ...typographyStyles.body_M,
+                              ...colorStyles.neutralColorDark_3,
+                            }}
+                          >
+                            {place.category.name}
+                          </Text>
+
+                          <View
+                            style={{
+                              flexDirection: "row",
+                              alignItems: "center",
+                            }}
+                          >
+                            <Text
+                              style={{
+                                ...typographyStyles.body_M,
+                                ...colorStyles.supportColorSuccess_1,
+                              }}
+                            >
+                              Đang mở cửa .
+                            </Text>
+                            <Text
+                              style={{
+                                ...typographyStyles.body_M,
+                                marginLeft: 4,
+                              }}
+                            >
+                              Đóng cửa lúc 20:30
+                            </Text>
+                          </View>
+                        </View>
+                        <View
+                          style={{
+                            flex: 2,
+                          }}
+                        >
+                          <TouchableOpacity
+                            onPress={() =>
+                              onFlyTo({
+                                latitude: place.location.coordinates[1],
+                                longitude: place.location.coordinates[0],
+                                latitudeDelta: 0.005,
+                                longitudeDelta: 0.005,
+                              })
+                            }
+                          >
+                            <View
+                              style={{
+                                height: 50,
+                                width: 50,
+                                borderRadius: 50,
+                                borderColor: Colors.dark.neutralColor_5,
+                                borderWidth: 1,
+                                marginTop: 12,
+                                alignItems: "center",
+                                justifyContent: "center",
+                              }}
+                            >
+                              <FontAwesome6
+                                name="diamond-turn-right"
+                                size={24}
+                                color={Colors.highlight.highlightColor_1}
+                              />
+                            </View>
+                          </TouchableOpacity>
+                        </View>
+                      </View>
+                    </View>
+                  ))
+                : ""}
+            </ScrollView>
+          </View>
+        </View>
+      </Modal>
     </View>
   );
 }
@@ -448,6 +830,7 @@ const styles = StyleSheet.create({
     borderTopRightRadius: 20,
     padding: 20,
     maxHeight: "80%",
+    paddingTop: 0,
   },
   placeImage: {
     width: "100%",
@@ -478,8 +861,8 @@ const styles = StyleSheet.create({
   },
   radiusSelector: {
     position: "absolute",
-    top: 100,
-    left: 20,
+    bottom: 10,
+    right: 10,
     width: 150,
     backgroundColor: "white",
     borderRadius: 10,
@@ -500,12 +883,12 @@ const pickerSelectStyles = StyleSheet.create({
   },
   inputAndroid: {
     fontSize: 6,
-    paddingHorizontal: 5,
-    paddingVertical: 8,
-    borderWidth: 0.5,
+
+    borderWidth: 2,
     borderColor: "purple",
     borderRadius: 8,
     color: "black",
-    paddingRight: 30,
+    marginBottom: 12,
+    height: 40,
   },
 });
