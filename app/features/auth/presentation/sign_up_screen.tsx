@@ -66,11 +66,6 @@ export default function SignUpScreen({
 
   //   handle sign up
   const handleSignUp = () => {
-    console.log("Email:", email);
-    console.log("Name:", name);
-    console.log("Password:", password);
-    console.log("Confirm Password:", confirmPassword);
-
     GetOTP();
   };
 

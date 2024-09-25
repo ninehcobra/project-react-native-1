@@ -90,9 +90,7 @@ export default function Map({
 
   useEffect(() => {
     if (isSuccess) {
-      console.log(searchResponse);
     } else if (isError) {
-      console.log(error);
     }
   }, [isSuccess, isError]);
 
@@ -244,7 +242,6 @@ export default function Map({
   };
 
   const handleClickPopUp = (business: IBusiness): void => {
-    console.log(business);
     dispatch(
       setSelectedBusiness({
         selectedBusinessId: business.id,

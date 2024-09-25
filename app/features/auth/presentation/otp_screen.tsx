@@ -84,7 +84,6 @@ export default function OtpScreen({
     }
     if (isRegisterError) {
       const errorResponse = registerError as ErrorResponse;
-      console.log(registerError);
       toastService.showError(errorResponse);
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps

@@ -1,6 +1,9 @@
 import { Colors } from "@/constants/colors";
+import { setSelectedBusiness } from "@/redux/slices/selected-business.slice";
+import { RootState } from "@/redux/store";
 import { IBusiness } from "@/types/business";
 import AntDesign from "@expo/vector-icons/build/AntDesign";
+
 import {
   Modal,
   View,
@@ -10,6 +13,7 @@ import {
   TouchableOpacity,
 } from "react-native";
 import Carousel from "react-native-reanimated-carousel";
+import { useDispatch, useSelector } from "react-redux";
 
 export default function DetailModal({
   modalVisible,
@@ -21,6 +25,21 @@ export default function DetailModal({
   selectedPlace: IBusiness | null;
 }): React.ReactNode {
   const width = Dimensions.get("window").width;
+
+  const dispatch = useDispatch();
+  const business: IBusiness | null = useSelector(
+    (state: RootState) => state.selectedBusiness.selectedBusinessData
+  );
+
+  const handleOnClose = (): void => {
+    dispatch(
+      setSelectedBusiness({
+        selectedBusinessId: null,
+        selectedBusinessData: null,
+      })
+    );
+  };
+
   return (
     <Modal
       animationType="slide"
@@ -40,7 +59,7 @@ export default function DetailModal({
                   autoPlay={true}
                   data={[...new Array(6).keys()]}
                   scrollAnimationDuration={1000}
-                  onSnapToItem={(index) => console.log("current index:", index)}
+                  onSnapToItem={(index) => {}}
                   renderItem={({ index }) => (
                     <View
                       style={{

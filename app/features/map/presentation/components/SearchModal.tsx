@@ -175,9 +175,7 @@ export default function SearchModal({
                                 : require("../../../../../assets/images/default_business.png")
                             }
                             defaultSource={require("../../../../../assets/images/default_business.png")}
-                            onError={(error) =>
-                              console.log("Image loading error:", error)
-                            }
+                            onError={(error) => {}}
                             style={{
                               borderRadius: 12,
                               width: 165,
