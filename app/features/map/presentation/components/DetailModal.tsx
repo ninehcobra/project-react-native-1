@@ -1,4 +1,4 @@
-import { Colors } from "@/constants/Colors";
+import { Colors } from "@/constants/colors";
 import { IBusiness } from "@/types/business";
 import AntDesign from "@expo/vector-icons/build/AntDesign";
 import {
@@ -85,39 +85,6 @@ export default function DetailModal({
 }
 
 const styles = StyleSheet.create({
-  container: {
-    flex: 1,
-  },
-  map: {
-    width: "100%",
-    height: "100%",
-  },
-  floatingButton: {
-    position: "absolute",
-
-    backgroundColor: Colors.dark.neutralColor_1,
-    padding: 10,
-    borderRadius: 20,
-  },
-  buttonText: {
-    color: "white",
-    fontWeight: "bold",
-    textTransform: "capitalize",
-  },
-  searchbar: {
-    position: "absolute",
-    top: 20,
-    left: 0,
-    width: "100%",
-    padding: 12,
-  },
-  floatingLeftBtn: {
-    position: "absolute",
-    left: 20,
-    backgroundColor: Colors.light.neutralColor_5,
-    padding: 10,
-    borderRadius: 20,
-  },
   modalView: {
     margin: 20,
     backgroundColor: "white",
@@ -185,14 +152,5 @@ const styles = StyleSheet.create({
     fontSize: 16,
     fontWeight: "bold",
     color: Colors.dark.neutralColor_2,
-  },
-  radiusSelector: {
-    position: "absolute",
-    bottom: 10,
-    right: 10,
-    width: 150,
-    backgroundColor: "white",
-    borderRadius: 10,
-    zIndex: 1,
   },
 });

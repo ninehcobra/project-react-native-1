@@ -8,11 +8,6 @@ import {
   Text,
   PermissionsAndroid,
   Platform,
-  Modal,
-  Image,
-  FlatList,
-  ScrollView,
-  Dimensions,
 } from "react-native";
 import MapView, { Circle, LatLng, Marker } from "react-native-maps";
 import { TextInput } from "react-native-paper";
@@ -20,27 +15,19 @@ import * as Location from "expo-location";
 import MaterialIcons from "@expo/vector-icons/MaterialIcons";
 import { useFindNearByQuery } from "@/services/near-by.service";
 import { IFindNearByPayLoad } from "@/types/near-by";
-
-import { AntDesign } from "@expo/vector-icons";
 import { IBusiness } from "@/types/business";
-
 import RNPickerSelect from "react-native-picker-select";
-
 import { SvgUri } from "react-native-svg";
-
-import Ionicons from "@expo/vector-icons/Ionicons";
-import { colorStyles } from "@/styles/color";
-
-import FontAwesome6 from "@expo/vector-icons/FontAwesome6";
-
-import Carousel from "react-native-reanimated-carousel";
 import { useDispatch } from "react-redux";
 import { setSelectedBusiness } from "@/redux/slices/selected-business.slice";
 import SearchModal from "../components/SearchModal";
 import DetailModal from "../components/DetailModal";
-import { Colors } from "@/constants/Colors";
+
 import { RADIUSOPTIONS } from "@/constants/radius";
 import { MAPTYPES, MAPTYPESLIST } from "@/constants/map";
+import { Colors } from "@/constants/colors";
+import { requestLocationPermission } from "@/utils/permission";
+import { getZoomLevel } from "@/utils/zoom";
 
 export default function Map({
   navigation,
@@ -123,35 +110,6 @@ export default function Map({
     setMapType(MAPTYPESLIST[nextIndex]);
   };
 
-  const requestLocationPermission = async () => {
-    if (Platform.OS === "android") {
-      try {
-        if (
-          (await PermissionsAndroid.check(
-            PermissionsAndroid.PERMISSIONS.ACCESS_FINE_LOCATION
-          )) === false
-        ) {
-          const granted = await PermissionsAndroid.request(
-            PermissionsAndroid.PERMISSIONS.ACCESS_FINE_LOCATION,
-            {
-              title: "Location Permission",
-              message: "App needs access to your location",
-              buttonNeutral: "Ask Me Later",
-              buttonNegative: "Cancel",
-              buttonPositive: "OK",
-            }
-          );
-          if (granted === PermissionsAndroid.RESULTS.GRANTED) {
-          } else {
-            toastService.showInfo("Location permission denied");
-          }
-        }
-      } catch (err) {
-        toastService.showInfo("Error requesting location permission");
-      }
-    }
-  };
-
   const getCurrentLocation = async () => {
     setSelectedLocation(null);
     if (currentLocation == null) {
@@ -231,10 +189,6 @@ export default function Map({
         setSearchResult(true);
       }, 1000);
     }
-  };
-
-  const getZoomLevel = (radius: number) => {
-    return Math.log2(360 * (40075017 / (radius * 1000 * 256))) - 1;
   };
 
   const updateMapRegion = (
@@ -447,81 +401,6 @@ const styles = StyleSheet.create({
     left: 0,
     width: "100%",
     padding: 12,
-  },
-  floatingLeftBtn: {
-    position: "absolute",
-    left: 20,
-    backgroundColor: Colors.light.neutralColor_5,
-    padding: 10,
-    borderRadius: 20,
-  },
-  modalView: {
-    margin: 20,
-    backgroundColor: "white",
-    borderRadius: 20,
-    padding: 35,
-    alignItems: "center",
-    shadowColor: "#000",
-    shadowOffset: {
-      width: 0,
-      height: 2,
-    },
-    shadowOpacity: 0.25,
-    shadowRadius: 4,
-    elevation: 5,
-  },
-  modalTitle: {
-    fontSize: 20,
-    fontWeight: "bold",
-    marginBottom: 15,
-  },
-  closeButton: {
-    position: "absolute",
-    top: 10,
-    right: 10,
-    backgroundColor: Colors.highlight.highlightColor_1,
-    borderRadius: 20,
-    padding: 8,
-  },
-  modalOverlay: {
-    flex: 1,
-    backgroundColor: "rgba(0, 0, 0, 0.5)",
-    justifyContent: "flex-end",
-  },
-  modalContent: {
-    backgroundColor: "white",
-    borderTopLeftRadius: 20,
-    borderTopRightRadius: 20,
-
-    maxHeight: "80%",
-    paddingTop: 0,
-  },
-  placeImage: {
-    width: "100%",
-    height: 200,
-    borderRadius: 10,
-    marginBottom: 15,
-  },
-  modalDescription: {
-    fontSize: 16,
-    marginBottom: 10,
-    color: Colors.dark.neutralColor_3,
-  },
-  modalInfo: {
-    fontSize: 14,
-    marginBottom: 5,
-    color: Colors.dark.neutralColor_4,
-  },
-  ratingContainer: {
-    flexDirection: "row",
-    alignItems: "center",
-    marginBottom: 10,
-  },
-  ratingText: {
-    marginLeft: 5,
-    fontSize: 16,
-    fontWeight: "bold",
-    color: Colors.dark.neutralColor_2,
   },
   radiusSelector: {
     position: "absolute",
