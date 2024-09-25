@@ -1,8 +1,12 @@
 import { Colors } from "@/constants/colors";
 import { setSelectedBusiness } from "@/redux/slices/selected-business.slice";
 import { RootState } from "@/redux/store";
+import { colorStyles } from "@/styles/color";
+import { typographyStyles } from "@/styles/typography";
 import { IBusiness } from "@/types/business";
 import AntDesign from "@expo/vector-icons/build/AntDesign";
+import MaterialIcons from "@expo/vector-icons/build/MaterialIcons";
+import { useState } from "react";
 
 import {
   Modal,
@@ -11,18 +15,20 @@ import {
   StyleSheet,
   Dimensions,
   TouchableOpacity,
+  Image,
 } from "react-native";
+import { SegmentedButtons } from "react-native-paper";
 import Carousel from "react-native-reanimated-carousel";
 import { useDispatch, useSelector } from "react-redux";
+import OverView from "./Tabs/OverView";
+import About from "./Tabs/About";
 
 export default function DetailModal({
   modalVisible,
   setModalVisible,
-  selectedPlace,
 }: {
   modalVisible: boolean;
   setModalVisible: (value: boolean) => void;
-  selectedPlace: IBusiness | null;
 }): React.ReactNode {
   const width = Dimensions.get("window").width;
 
@@ -38,63 +44,219 @@ export default function DetailModal({
         selectedBusinessData: null,
       })
     );
+
+    setModalVisible(false);
   };
+
+  const [value, setValue] = useState<string>("overview");
 
   return (
     <Modal
       animationType="slide"
       transparent={true}
       visible={modalVisible}
-      onRequestClose={() => setModalVisible(false)}
+      onRequestClose={handleOnClose}
     >
       <View style={styles.modalOverlay}>
         <View style={styles.modalContent}>
-          {selectedPlace && (
+          {business && (
             <>
               <View style={{ height: 250 }}>
                 <Carousel
                   loop
                   width={width}
                   height={250}
+                  data={business.images}
                   autoPlay={true}
-                  data={[...new Array(6).keys()]}
-                  scrollAnimationDuration={1000}
+                  autoPlayInterval={20000}
+                  scrollAnimationDuration={2000}
                   onSnapToItem={(index) => {}}
-                  renderItem={({ index }) => (
+                  renderItem={({ item }) => (
                     <View
                       style={{
                         flex: 1,
-                        borderWidth: 1,
                         justifyContent: "center",
                       }}
                     >
-                      <Text style={{ textAlign: "center", fontSize: 30 }}>
-                        {index}
-                      </Text>
+                      <Image
+                        source={
+                          item.url
+                            ? { uri: item.url }
+                            : require("../../../../../assets/images/default_business.png")
+                        }
+                        defaultSource={require("../../../../../assets/images/default_business.png")}
+                        onError={(error) => {}}
+                        style={{
+                          flex: 1,
+                          borderTopLeftRadius: 12,
+                          borderTopRightRadius: 12,
+                        }}
+                      />
                     </View>
                   )}
                 />
               </View>
-              <Text style={styles.modalTitle}>{selectedPlace.name}</Text>
-              <Text style={styles.modalDescription}>
-                {selectedPlace.description}
-              </Text>
-              <Text style={styles.modalInfo}>{selectedPlace.fullAddress}</Text>
-              <View style={styles.ratingContainer}>
-                <AntDesign name="star" size={20} color="#FFD700" />
-                <Text style={styles.ratingText}>
-                  {selectedPlace.overallRating}
-                </Text>
-              </View>
-              <Text style={styles.modalInfo}>
-                Phone: {selectedPlace.phoneNumber}
-              </Text>
               <TouchableOpacity
                 style={styles.closeButton}
-                onPress={() => setModalVisible(false)}
+                onPress={handleOnClose}
               >
                 <AntDesign name="close" size={24} color="white" />
               </TouchableOpacity>
+              <View>
+                <View style={{ padding: 12, paddingBottom: 0 }}>
+                  <Text style={styles.modalTitle}>{business.name}</Text>
+                  <View
+                    style={{
+                      marginLeft: 4,
+                      marginBottom: 4,
+                      flexDirection: "row",
+                      alignItems: "center",
+                    }}
+                  >
+                    <View>
+                      <View style={{ flexDirection: "row" }}>
+                        <Text
+                          style={{
+                            ...colorStyles.neutralColorDark_3,
+                            marginRight: 4,
+                          }}
+                        >
+                          {business.overallRating}
+                        </Text>
+                        {[1, 2, 3, 4, 5].map((index) => {
+                          const starValue = business.overallRating - index + 1;
+                          if (starValue >= 1) {
+                            return (
+                              <MaterialIcons
+                                key={index}
+                                name="star"
+                                size={18}
+                                color={Colors.support.warningColor_1}
+                              />
+                            );
+                          } else if (starValue > 0) {
+                            return (
+                              <MaterialIcons
+                                key={index}
+                                name="star-half"
+                                size={18}
+                                color={Colors.support.warningColor_1}
+                              />
+                            );
+                          } else {
+                            return (
+                              <MaterialIcons
+                                key={index}
+                                name="star-outline"
+                                size={18}
+                                color={Colors.support.warningColor_1}
+                              />
+                            );
+                          }
+                        })}
+                        <Text
+                          style={{
+                            ...colorStyles.neutralColorDark_3,
+                            marginLeft: 4,
+                          }}
+                        >
+                          {`(${business.totalReview})`}
+                        </Text>
+                      </View>
+                      <View style={{ flexDirection: "row" }}>
+                        <Text
+                          style={{
+                            ...colorStyles.neutralColorDark_3,
+                            lineHeight: 16,
+                          }}
+                        >
+                          {business.category.name}
+                        </Text>
+
+                        <Text
+                          style={{
+                            ...colorStyles.neutralColorDark_3,
+                            lineHeight: 16,
+                          }}
+                        >
+                          {` - ${(business._distance / 1000).toFixed(2)} km`}
+                        </Text>
+                      </View>
+                    </View>
+                  </View>
+                </View>
+                {/* Tab view */}
+                <View
+                  style={{
+                    flexDirection: "row",
+                    justifyContent: "space-around",
+                    alignItems: "center",
+
+                    marginBottom: 4,
+                    borderBottomWidth: 0.5,
+                    borderBottomColor: Colors.dark.neutralColor_5,
+                  }}
+                >
+                  <TouchableOpacity onPress={() => setValue("overview")}>
+                    <Text
+                      style={{
+                        color:
+                          value === "overview"
+                            ? Colors.highlight.highlightColor_1
+                            : Colors.dark.neutralColor_3,
+                        fontWeight: "bold",
+                        paddingVertical: 12,
+                        borderBottomWidth: value === "overview" ? 2 : 0,
+                        borderBottomColor: Colors.highlight.highlightColor_1,
+                      }}
+                    >
+                      Tổng quan
+                    </Text>
+                  </TouchableOpacity>
+                  <TouchableOpacity onPress={() => setValue("review")}>
+                    <Text
+                      style={{
+                        color:
+                          value === "review"
+                            ? Colors.highlight.highlightColor_1
+                            : Colors.dark.neutralColor_3,
+                        fontWeight: "bold",
+                        paddingVertical: 12,
+                        borderBottomWidth: value === "review" ? 2 : 0,
+                        borderBottomColor: Colors.highlight.highlightColor_1,
+                      }}
+                    >
+                      Đánh giá
+                    </Text>
+                  </TouchableOpacity>
+                  <TouchableOpacity onPress={() => setValue("about")}>
+                    <Text
+                      style={{
+                        color:
+                          value === "about"
+                            ? Colors.highlight.highlightColor_1
+                            : Colors.dark.neutralColor_3,
+                        fontWeight: "bold",
+                        paddingVertical: 12,
+                        borderBottomWidth: value === "about" ? 2 : 0,
+                        borderBottomColor: Colors.highlight.highlightColor_1,
+                      }}
+                    >
+                      Thông tin
+                    </Text>
+                  </TouchableOpacity>
+                </View>
+                {/* End Tab view */}
+                <View style={{ height: 600, padding: 12 }}>
+                  {value === "about" ? (
+                    <About business={business} />
+                  ) : value === "overview" ? (
+                    <OverView business={business} />
+                  ) : (
+                    <Text>Review</Text>
+                  )}
+                </View>
+              </View>
             </>
           )}
         </View>
@@ -122,7 +284,6 @@ const styles = StyleSheet.create({
   modalTitle: {
     fontSize: 20,
     fontWeight: "bold",
-    marginBottom: 15,
   },
   closeButton: {
     position: "absolute",

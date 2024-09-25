@@ -44,8 +44,6 @@ export default function Map({
 
   const [position, setPosition] = useState<[number, number]>([0, 0]);
 
-  const [selectedPlace, setSelectedPlace] = useState<IBusiness | null>(null);
-
   const [modalVisible, setModalVisible] = useState(false);
 
   const [selectedRadius, setSelectedRadius] = useState<number>(5);
@@ -93,11 +91,6 @@ export default function Map({
     } else if (isError) {
     }
   }, [isSuccess, isError]);
-
-  const showPlaceDetails = (place: any) => {
-    setSelectedPlace(place);
-    setModalVisible(true);
-  };
 
   const mapRef = useRef<MapView>(null);
   const cycleMapType = () => {
@@ -248,6 +241,8 @@ export default function Map({
         selectedBusinessData: business,
       })
     );
+
+    setModalVisible(true);
   };
 
   return (
@@ -303,15 +298,10 @@ export default function Map({
               latitude: place.location.coordinates[1],
               longitude: place.location.coordinates[0],
             }}
-            onPress={() => showPlaceDetails(place)}
+            onPress={() => handleClickPopUp(place)}
             pinColor={Colors.highlight.highlightColor_1}
           >
-            <SvgUri
-              onPress={() => handleClickPopUp(place)}
-              width="40"
-              height="40"
-              uri={place.category.linkURL}
-            />
+            <SvgUri width="40" height="40" uri={place.category.linkURL} />
           </Marker>
         ))}
       </MapView>
@@ -363,7 +353,6 @@ export default function Map({
       <DetailModal
         modalVisible={modalVisible}
         setModalVisible={setModalVisible}
-        selectedPlace={selectedPlace}
       />
       <View style={styles.radiusSelector}>
         <RNPickerSelect

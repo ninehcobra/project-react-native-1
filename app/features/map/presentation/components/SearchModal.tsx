@@ -25,7 +25,7 @@ export default function SearchModal({
   setSearchResult: (value: boolean) => void;
   searchResult: boolean;
   searchResponse: IFindNearByResponse | undefined;
-  onFlyTo: ({
+  onFlyTo({
     latitude,
     longitude,
     latitudeDelta,
@@ -35,7 +35,7 @@ export default function SearchModal({
     longitude: number;
     latitudeDelta: number;
     longitudeDelta: number;
-  }) => void;
+  }): void;
 }): React.ReactNode {
   return (
     <Modal
@@ -45,7 +45,7 @@ export default function SearchModal({
       visible={searchResult}
     >
       <View style={styles.modalOverlay}>
-        <View style={{ ...styles.modalContent, padding: 12 }}>
+        <View style={styles.modalContent}>
           <TouchableOpacity
             style={styles.closeButton}
             onPress={() => setSearchResult(false)}
@@ -379,6 +379,59 @@ export default function SearchModal({
 }
 
 const styles = StyleSheet.create({
+  container: {
+    flex: 1,
+  },
+  map: {
+    width: "100%",
+    height: "100%",
+  },
+  floatingButton: {
+    position: "absolute",
+
+    backgroundColor: Colors.dark.neutralColor_1,
+    padding: 10,
+    borderRadius: 20,
+  },
+  buttonText: {
+    color: "white",
+    fontWeight: "bold",
+    textTransform: "capitalize",
+  },
+  searchbar: {
+    position: "absolute",
+    top: 20,
+    left: 0,
+    width: "100%",
+    padding: 12,
+  },
+  floatingLeftBtn: {
+    position: "absolute",
+    left: 20,
+    backgroundColor: Colors.light.neutralColor_5,
+    padding: 10,
+    borderRadius: 20,
+  },
+  modalView: {
+    margin: 20,
+    backgroundColor: "white",
+    borderRadius: 20,
+    padding: 35,
+    alignItems: "center",
+    shadowColor: "#000",
+    shadowOffset: {
+      width: 0,
+      height: 2,
+    },
+    shadowOpacity: 0.25,
+    shadowRadius: 4,
+    elevation: 5,
+  },
+  modalTitle: {
+    fontSize: 20,
+    fontWeight: "bold",
+    marginBottom: 15,
+  },
   closeButton: {
     position: "absolute",
     top: 10,
@@ -399,5 +452,41 @@ const styles = StyleSheet.create({
 
     maxHeight: "80%",
     paddingTop: 0,
+  },
+  placeImage: {
+    width: "100%",
+    height: 200,
+    borderRadius: 10,
+    marginBottom: 15,
+  },
+  modalDescription: {
+    fontSize: 16,
+    marginBottom: 10,
+    color: Colors.dark.neutralColor_3,
+  },
+  modalInfo: {
+    fontSize: 14,
+    marginBottom: 5,
+    color: Colors.dark.neutralColor_4,
+  },
+  ratingContainer: {
+    flexDirection: "row",
+    alignItems: "center",
+    marginBottom: 10,
+  },
+  ratingText: {
+    marginLeft: 5,
+    fontSize: 16,
+    fontWeight: "bold",
+    color: Colors.dark.neutralColor_2,
+  },
+  radiusSelector: {
+    position: "absolute",
+    bottom: 10,
+    right: 10,
+    width: 150,
+    backgroundColor: "white",
+    borderRadius: 10,
+    zIndex: 1,
   },
 });
