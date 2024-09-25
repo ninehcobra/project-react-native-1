@@ -5,10 +5,12 @@ import { configureStore } from "@reduxjs/toolkit";
 import { selectedBusinessSlice } from "./slices/selected-business.slice";
 import { setupListeners } from "@reduxjs/toolkit/query";
 import { reviewApi } from "@/services/review.service";
+import { previewImageSlice } from "./slices/preview-image.slice";
 
 export const store = configureStore({
   reducer: {
     selectedBusiness: selectedBusinessSlice.reducer,
+    previewImage: previewImageSlice.reducer,
     [authApi.reducerPath]: authApi.reducer,
     [otpApi.reducerPath]: otpApi.reducer,
     [nearByApi.reducerPath]: nearByApi.reducer,

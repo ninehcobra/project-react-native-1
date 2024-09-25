@@ -8,6 +8,7 @@ import {
   Text,
   PermissionsAndroid,
   Platform,
+  ImageSourcePropType,
 } from "react-native";
 import MapView, { Circle, LatLng, Marker } from "react-native-maps";
 import { TextInput } from "react-native-paper";
@@ -18,7 +19,7 @@ import { IFindNearByPayLoad } from "@/types/near-by";
 import { IBusiness } from "@/types/business";
 import RNPickerSelect from "react-native-picker-select";
 import { SvgUri } from "react-native-svg";
-import { useDispatch } from "react-redux";
+import { useDispatch, useSelector } from "react-redux";
 import { setSelectedBusiness } from "@/redux/slices/selected-business.slice";
 import SearchModal from "../components/SearchModal";
 import DetailModal from "../components/DetailModal";
@@ -26,6 +27,12 @@ import DetailModal from "../components/DetailModal";
 import { RADIUSOPTIONS } from "@/constants/radius";
 import { MAPTYPES, MAPTYPESLIST } from "@/constants/map";
 import { Colors } from "@/constants/colors";
+import { RootState } from "@/redux/store";
+import {
+  IPreviewImage,
+  setPreviewImage,
+} from "@/redux/slices/preview-image.slice";
+import ImagePreviewModal from "../components/ImagePreviewModal";
 
 export default function Map({
   navigation,
@@ -51,6 +58,14 @@ export default function Map({
   const [searchResult, setSearchResult] = useState<boolean>(false);
 
   const dispatch = useDispatch();
+
+  const handleOnClosePreviewImage = (value: boolean): void => {
+    dispatch(setPreviewImage({ isPreview: value, image: null }));
+  };
+
+  const imagePreview: IPreviewImage = useSelector(
+    (state: RootState) => state.previewImage
+  );
 
   const [queryData, setQueryData] = useState<IFindNearByPayLoad>({
     latitude: position[0],
@@ -388,6 +403,12 @@ export default function Map({
         searchResult={searchResult}
         searchResponse={searchResponse}
         onFlyTo={onFlyTo}
+      />
+
+      <ImagePreviewModal
+        isOpen={imagePreview.isPreview}
+        imageSource={imagePreview.image}
+        setIsOpen={handleOnClosePreviewImage}
       />
     </View>
   );

@@ -1,10 +1,19 @@
 import { Colors } from "@/constants/colors";
+import { setPreviewImage } from "@/redux/slices/preview-image.slice";
 import { colorStyles } from "@/styles/color";
 import { typographyStyles } from "@/styles/typography";
 import { IBusiness } from "@/types/business";
 import MaterialIcons from "@expo/vector-icons/build/MaterialIcons";
 import FontAwesome6 from "@expo/vector-icons/FontAwesome6";
-import { ScrollView, View, Image, Text, TouchableOpacity } from "react-native";
+import {
+  ScrollView,
+  View,
+  Image,
+  Text,
+  TouchableOpacity,
+  ImageSourcePropType,
+} from "react-native";
+import { useDispatch } from "react-redux";
 
 export default function BusinessCard({
   place,
@@ -27,27 +36,42 @@ export default function BusinessCard({
     longitudeDelta: number;
   }): void;
 }): React.ReactNode {
+  const dispatch = useDispatch();
+  const handleOnOpenPreviewImage = (image: ImageSourcePropType): void => {
+    dispatch(setPreviewImage({ isPreview: true, image: image }));
+  };
+
   return (
     <View key={place.id} style={{ marginBottom: 24 }}>
       <ScrollView showsHorizontalScrollIndicator={false} horizontal={true}>
         {place.images.length > 0 ? (
           place.images.map((image) => {
             return (
-              <Image
-                source={
-                  image.url
-                    ? { uri: image.url }
-                    : require("../../../../../assets/images/default_business.png")
+              <TouchableOpacity
+                onPress={() =>
+                  handleOnOpenPreviewImage(
+                    image.url
+                      ? { uri: image.url }
+                      : require("../../../../../assets/images/default_business.png")
+                  )
                 }
-                defaultSource={require("../../../../../assets/images/default_business.png")}
-                onError={(error) => {}}
-                style={{
-                  borderRadius: 12,
-                  width: 165,
-                  height: 165,
-                  marginRight: 12,
-                }}
-              />
+              >
+                <Image
+                  source={
+                    image.url
+                      ? { uri: image.url }
+                      : require("../../../../../assets/images/default_business.png")
+                  }
+                  defaultSource={require("../../../../../assets/images/default_business.png")}
+                  onError={(error) => {}}
+                  style={{
+                    borderRadius: 12,
+                    width: 165,
+                    height: 165,
+                    marginRight: 12,
+                  }}
+                />
+              </TouchableOpacity>
             );
           })
         ) : (

@@ -16,12 +16,14 @@ import {
   Dimensions,
   TouchableOpacity,
   Image,
+  ImageSourcePropType,
 } from "react-native";
 import { SegmentedButtons } from "react-native-paper";
 import Carousel from "react-native-reanimated-carousel";
 import { useDispatch, useSelector } from "react-redux";
 import OverView from "./Tabs/OverView";
 import About from "./Tabs/About";
+import { setPreviewImage } from "@/redux/slices/preview-image.slice";
 
 export default function DetailModal({
   modalVisible,
@@ -46,9 +48,14 @@ export default function DetailModal({
     );
 
     setModalVisible(false);
+    setValue("overview");
   };
 
   const [value, setValue] = useState<string>("overview");
+
+  const handleOnOpenPreviewImage = (image: ImageSourcePropType): void => {
+    dispatch(setPreviewImage({ isPreview: true, image: image }));
+  };
 
   return (
     <Modal
@@ -71,29 +78,32 @@ export default function DetailModal({
                   autoPlayInterval={20000}
                   scrollAnimationDuration={2000}
                   onSnapToItem={(index) => {}}
-                  renderItem={({ item }) => (
-                    <View
-                      style={{
-                        flex: 1,
-                        justifyContent: "center",
-                      }}
-                    >
-                      <Image
-                        source={
-                          item.url
-                            ? { uri: item.url }
-                            : require("../../../../../assets/images/default_business.png")
-                        }
-                        defaultSource={require("../../../../../assets/images/default_business.png")}
-                        onError={(error) => {}}
+                  renderItem={({ item }) => {
+                    const imageSource = item.url
+                      ? { uri: item.url }
+                      : require("../../../../../assets/images/default_business.png");
+
+                    return (
+                      <TouchableOpacity
                         style={{
                           flex: 1,
-                          borderTopLeftRadius: 12,
-                          borderTopRightRadius: 12,
+                          justifyContent: "center",
                         }}
-                      />
-                    </View>
-                  )}
+                        onPress={() => handleOnOpenPreviewImage(imageSource)}
+                      >
+                        <Image
+                          source={imageSource}
+                          defaultSource={require("../../../../../assets/images/default_business.png")}
+                          onError={(error) => {}}
+                          style={{
+                            flex: 1,
+                            borderTopLeftRadius: 12,
+                            borderTopRightRadius: 12,
+                          }}
+                        />
+                      </TouchableOpacity>
+                    );
+                  }}
                 />
               </View>
               <TouchableOpacity
@@ -247,7 +257,7 @@ export default function DetailModal({
                   </TouchableOpacity>
                 </View>
                 {/* End Tab view */}
-                <View style={{ height: 600, padding: 12 }}>
+                <View style={{ height: 290 }}>
                   {value === "about" ? (
                     <About business={business} />
                   ) : value === "overview" ? (
