@@ -1,4 +1,3 @@
-import { Colors } from "@/constants/Colors";
 import { ToastService } from "@/services/toast.service";
 import { typographyStyles } from "@/styles/typography";
 import React, { useEffect, useMemo, useRef, useState } from "react";
@@ -9,8 +8,6 @@ import {
   Text,
   PermissionsAndroid,
   Platform,
-  Modal,
-  Image,
 } from "react-native";
 import MapView, { Circle, LatLng, Marker } from "react-native-maps";
 import { TextInput } from "react-native-paper";
@@ -18,13 +15,19 @@ import * as Location from "expo-location";
 import MaterialIcons from "@expo/vector-icons/MaterialIcons";
 import { useFindNearByQuery } from "@/services/near-by.service";
 import { IFindNearByPayLoad } from "@/types/near-by";
-
-import { AntDesign } from "@expo/vector-icons";
 import { IBusiness } from "@/types/business";
-
 import RNPickerSelect from "react-native-picker-select";
+import { SvgUri } from "react-native-svg";
+import { useDispatch } from "react-redux";
+import { setSelectedBusiness } from "@/redux/slices/selected-business.slice";
+import SearchModal from "../components/SearchModal";
+import DetailModal from "../components/DetailModal";
 
-const mapTypes = ["standard", "satellite", "hybrid", "terrain"];
+import { RADIUSOPTIONS } from "@/constants/radius";
+import { MAPTYPES, MAPTYPESLIST } from "@/constants/map";
+import { Colors } from "@/constants/colors";
+import { requestLocationPermission } from "@/utils/permission";
+import { getZoomLevel } from "@/utils/zoom";
 
 export default function Map({
   navigation,
@@ -32,8 +35,8 @@ export default function Map({
   navigation: any;
 }): React.ReactNode {
   const [mapType, setMapType] = useState<
-    "standard" | "satellite" | "hybrid" | "terrain"
-  >("terrain");
+    MAPTYPES.HYBRID | MAPTYPES.STANDARD | MAPTYPES.TERRAIN | MAPTYPES.SATELLITE
+  >(MAPTYPES.TERRAIN);
 
   const [currentLocation, setCurrentLocation] = useState<LatLng | null>(null);
 
@@ -49,31 +52,19 @@ export default function Map({
 
   const [selectedRadius, setSelectedRadius] = useState<number>(5);
 
-  const radiusOptions = [
-    { label: "500m", value: 0.5 },
-    { label: "1km", value: 1 },
-    { label: "2km", value: 2 },
-    { label: "5km", value: 5 },
-    { label: "10km", value: 10 },
-    { label: "20km", value: 20 },
-  ];
+  const [searchResult, setSearchResult] = useState<boolean>(false);
+
+  const dispatch = useDispatch();
 
   const [queryData, setQueryData] = useState<IFindNearByPayLoad>({
     latitude: position[0],
     longitude: position[1],
     radius: selectedRadius,
     q: "",
+    limit: 200,
   });
-
-  const showPlaceDetails = (place: any) => {
-    setSelectedPlace(place);
-    setModalVisible(true);
-  };
-
   const {
     data: searchResponse,
-    isLoading,
-    isFetching,
     isSuccess,
     isError,
     error,
@@ -82,47 +73,41 @@ export default function Map({
     skip: !isSearching,
   });
 
-  const mapRef = useRef<MapView>(null);
-  const cycleMapType = () => {
-    const currentIndex = mapTypes.indexOf(mapType);
-    const nextIndex = (currentIndex + 1) % mapTypes.length;
-    setMapType(
-      mapTypes[nextIndex] as "standard" | "satellite" | "hybrid" | "terrain"
-    );
-  };
-
   const toastService = useMemo<ToastService>(
     () => new ToastService(navigation),
     [navigation]
   );
 
-  const requestLocationPermission = async () => {
-    if (Platform.OS === "android") {
-      try {
-        if (
-          (await PermissionsAndroid.check(
-            PermissionsAndroid.PERMISSIONS.ACCESS_FINE_LOCATION
-          )) === false
-        ) {
-          const granted = await PermissionsAndroid.request(
-            PermissionsAndroid.PERMISSIONS.ACCESS_FINE_LOCATION,
-            {
-              title: "Location Permission",
-              message: "App needs access to your location",
-              buttonNeutral: "Ask Me Later",
-              buttonNegative: "Cancel",
-              buttonPositive: "OK",
-            }
-          );
-          if (granted === PermissionsAndroid.RESULTS.GRANTED) {
-          } else {
-            toastService.showInfo("Location permission denied");
-          }
-        }
-      } catch (err) {
-        toastService.showInfo("Error requesting location permission");
-      }
+  useEffect(() => {
+    if (isSearching && selectedLocation) {
+      updateMapRegion(
+        selectedLocation.latitude,
+        selectedLocation.longitude,
+        selectedRadius
+      );
+
+      refetch();
     }
+  }, [queryData, selectedRadius]);
+
+  useEffect(() => {
+    if (isSuccess) {
+      console.log(searchResponse);
+    } else if (isError) {
+      console.log(error);
+    }
+  }, [isSuccess, isError]);
+
+  const showPlaceDetails = (place: any) => {
+    setSelectedPlace(place);
+    setModalVisible(true);
+  };
+
+  const mapRef = useRef<MapView>(null);
+  const cycleMapType = () => {
+    const currentIndex = MAPTYPESLIST.indexOf(mapType);
+    const nextIndex = (currentIndex + 1) % MAPTYPESLIST.length;
+    setMapType(MAPTYPESLIST[nextIndex]);
   };
 
   const getCurrentLocation = async () => {
@@ -165,6 +150,7 @@ export default function Map({
     latitudeDelta: number;
     longitudeDelta: number;
   }): void => {
+    setSearchResult(false);
     mapRef.current?.animateToRegion(
       {
         latitude: latitude,
@@ -194,20 +180,47 @@ export default function Map({
         latitude: selectedLocation.latitude,
         longitude: selectedLocation.longitude,
       });
+      updateMapRegion(
+        selectedLocation.latitude,
+        selectedLocation.longitude,
+        selectedRadius
+      );
+      setTimeout(() => {
+        setSearchResult(true);
+      }, 1000);
     }
   };
 
-  useEffect(() => {
-    isSearching && refetch();
-  }, [queryData, selectedRadius]);
+  const updateMapRegion = (
+    latitude: number,
+    longitude: number,
+    radius: number
+  ) => {
+    const zoomLevel = getZoomLevel(radius);
+    const latDelta = (radius * 2) / 111.32;
+    const lonDelta =
+      (radius * 2) / (111.32 * Math.cos(latitude * (Math.PI / 180)));
 
-  useEffect(() => {
-    if (isSuccess) {
-      console.log(searchResponse);
-    } else if (isError) {
-      console.log(error);
-    }
-  }, [isSuccess, isError]);
+    mapRef.current?.animateToRegion(
+      {
+        latitude,
+        longitude,
+        latitudeDelta: latDelta,
+        longitudeDelta: lonDelta,
+      },
+      1000
+    );
+  };
+
+  const handleClickPopUp = (business: IBusiness): void => {
+    console.log(business);
+    dispatch(
+      setSelectedBusiness({
+        selectedBusinessId: business.id,
+        selectedBusinessData: business,
+      })
+    );
+  };
 
   return (
     <View style={styles.container}>
@@ -265,18 +278,17 @@ export default function Map({
             onPress={() => showPlaceDetails(place)}
             pinColor={Colors.highlight.highlightColor_1}
           >
-            {/* <Text>{place.name}</Text>
             <SvgUri
-              key={place.id}
-              height={35}
-              width={35}
-              source={{ uri: place.category.linkURL }}
-            /> */}
+              onPress={() => handleClickPopUp(place)}
+              width="40"
+              height="40"
+              uri={place.category.linkURL}
+            />
           </Marker>
         ))}
       </MapView>
       <TouchableOpacity
-        style={{ ...styles.floatingButton, bottom: 20, right: 20 }}
+        style={{ ...styles.floatingButton, bottom: 72, right: 20 }}
         onPress={cycleMapType}
       >
         <Text style={styles.buttonText}>
@@ -320,47 +332,11 @@ export default function Map({
         />
       </TouchableOpacity>
 
-      <Modal
-        animationType="slide"
-        transparent={true}
-        visible={modalVisible}
-        onRequestClose={() => setModalVisible(false)}
-      >
-        <View style={styles.modalOverlay}>
-          <View style={styles.modalContent}>
-            {selectedPlace && (
-              <>
-                <Image
-                  source={{ uri: selectedPlace.images[0].url }}
-                  style={styles.placeImage}
-                />
-                <Text style={styles.modalTitle}>{selectedPlace.name}</Text>
-                <Text style={styles.modalDescription}>
-                  {selectedPlace.description}
-                </Text>
-                <Text style={styles.modalInfo}>
-                  {selectedPlace.fullAddress}
-                </Text>
-                <View style={styles.ratingContainer}>
-                  <AntDesign name="star" size={20} color="#FFD700" />
-                  <Text style={styles.ratingText}>
-                    {selectedPlace.overallRating}
-                  </Text>
-                </View>
-                <Text style={styles.modalInfo}>
-                  Phone: {selectedPlace.phoneNumber}
-                </Text>
-                <TouchableOpacity
-                  style={styles.closeButton}
-                  onPress={() => setModalVisible(false)}
-                >
-                  <AntDesign name="close" size={24} color="white" />
-                </TouchableOpacity>
-              </>
-            )}
-          </View>
-        </View>
-      </Modal>
+      <DetailModal
+        modalVisible={modalVisible}
+        setModalVisible={setModalVisible}
+        selectedPlace={selectedPlace}
+      />
       <View style={styles.radiusSelector}>
         <RNPickerSelect
           onValueChange={(value) => {
@@ -369,14 +345,33 @@ export default function Map({
             setQueryData({
               ...queryData,
               radius: value,
+              limit:
+                value == 0.5
+                  ? 20
+                  : value == 1
+                  ? 30
+                  : value == 2
+                  ? 40
+                  : value == 5
+                  ? 50
+                  : value == 10
+                  ? 100
+                  : 200,
             });
           }}
-          items={radiusOptions}
+          items={RADIUSOPTIONS}
           value={selectedRadius}
           style={pickerSelectStyles}
-          placeholder={{ label: "Select radius", value: null }}
+          placeholder={{ label: "Chọn bán kính", value: null }}
         />
       </View>
+
+      <SearchModal
+        setSearchResult={setSearchResult}
+        searchResult={searchResult}
+        searchResponse={searchResponse}
+        onFlyTo={onFlyTo}
+      />
     </View>
   );
 }
@@ -407,84 +402,10 @@ const styles = StyleSheet.create({
     width: "100%",
     padding: 12,
   },
-  floatingLeftBtn: {
-    position: "absolute",
-    left: 20,
-    backgroundColor: Colors.light.neutralColor_5,
-    padding: 10,
-    borderRadius: 20,
-  },
-  modalView: {
-    margin: 20,
-    backgroundColor: "white",
-    borderRadius: 20,
-    padding: 35,
-    alignItems: "center",
-    shadowColor: "#000",
-    shadowOffset: {
-      width: 0,
-      height: 2,
-    },
-    shadowOpacity: 0.25,
-    shadowRadius: 4,
-    elevation: 5,
-  },
-  modalTitle: {
-    fontSize: 20,
-    fontWeight: "bold",
-    marginBottom: 15,
-  },
-  closeButton: {
-    position: "absolute",
-    top: 10,
-    right: 10,
-    backgroundColor: Colors.highlight.highlightColor_1,
-    borderRadius: 20,
-    padding: 8,
-  },
-  modalOverlay: {
-    flex: 1,
-    backgroundColor: "rgba(0, 0, 0, 0.5)",
-    justifyContent: "flex-end",
-  },
-  modalContent: {
-    backgroundColor: "white",
-    borderTopLeftRadius: 20,
-    borderTopRightRadius: 20,
-    padding: 20,
-    maxHeight: "80%",
-  },
-  placeImage: {
-    width: "100%",
-    height: 200,
-    borderRadius: 10,
-    marginBottom: 15,
-  },
-  modalDescription: {
-    fontSize: 16,
-    marginBottom: 10,
-    color: Colors.dark.neutralColor_3,
-  },
-  modalInfo: {
-    fontSize: 14,
-    marginBottom: 5,
-    color: Colors.dark.neutralColor_4,
-  },
-  ratingContainer: {
-    flexDirection: "row",
-    alignItems: "center",
-    marginBottom: 10,
-  },
-  ratingText: {
-    marginLeft: 5,
-    fontSize: 16,
-    fontWeight: "bold",
-    color: Colors.dark.neutralColor_2,
-  },
   radiusSelector: {
     position: "absolute",
-    top: 100,
-    left: 20,
+    bottom: 10,
+    right: 10,
     width: 150,
     backgroundColor: "white",
     borderRadius: 10,
@@ -505,12 +426,12 @@ const pickerSelectStyles = StyleSheet.create({
   },
   inputAndroid: {
     fontSize: 6,
-    paddingHorizontal: 5,
-    paddingVertical: 8,
-    borderWidth: 0.5,
+
+    borderWidth: 2,
     borderColor: "purple",
     borderRadius: 8,
     color: "black",
-    paddingRight: 30,
+    marginBottom: 12,
+    height: 40,
   },
 });

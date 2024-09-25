@@ -1,4 +1,4 @@
-import { Colors } from "@/constants/Colors";
+import { Colors } from "@/constants/colors";
 import { Text, TouchableOpacity, View } from "react-native";
 import { IconProps } from "react-native-vector-icons/Icon";
 

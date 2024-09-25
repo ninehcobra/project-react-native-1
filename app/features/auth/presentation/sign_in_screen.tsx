@@ -1,7 +1,7 @@
 import Badge from "@/components/prototyping_components/Badge";
 import ContainerWrapper from "@/components/prototyping_components/ContainerWrapper";
 import CustomButton from "@/components/prototyping_components/CustomButton";
-import { Colors } from "@/constants/Colors";
+import { Colors } from "@/constants/colors";
 import { useLoginUserMutation } from "@/services/auth.service";
 import { ToastService } from "@/services/toast.service";
 import { colorStyles } from "@/styles/color";

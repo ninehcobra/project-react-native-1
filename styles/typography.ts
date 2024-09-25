@@ -46,6 +46,7 @@ export const typographyStyles = StyleSheet.create({
     ...defaultFontStyle,
     fontSize: 14,
     fontWeight: "regular",
+    lineHeight: 18,
   },
   body_S: {
     ...defaultFontStyle,

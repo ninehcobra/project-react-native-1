@@ -1,4 +1,4 @@
-import { Colors } from "@/constants/Colors";
+import { Colors } from "@/constants/colors";
 import React, { useState, useEffect } from "react";
 import { Image, View } from "react-native";
 import Icon from "react-native-vector-icons/FontAwesome";
