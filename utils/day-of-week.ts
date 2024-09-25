@@ -55,6 +55,16 @@ const getNextOpeningTime = (
     (day) => day.day === now.format("dddd").toLowerCase()
   );
 
+  const vietnameseDays = {
+    monday: "Thứ Hai",
+    tuesday: "Thứ Ba",
+    wednesday: "Thứ Tư",
+    thursday: "Thứ Năm",
+    friday: "Thứ Sáu",
+    saturday: "Thứ Bảy",
+    sunday: "Chủ Nhật",
+  };
+
   for (let i = 1; i <= 7; i++) {
     const nextDayIndex = (currentDayIndex + i) % 7;
     const nextDay = sortedDays[nextDayIndex];
@@ -72,7 +82,9 @@ const getNextOpeningTime = (
         });
 
       if (nextOpeningDateTime.isAfter(now)) {
-        return `Quán sẽ mở cửa vào lúc ${nextDay.openTime} (${nextDay.day})`;
+        const vietnameseDay =
+          vietnameseDays[nextDay.day as keyof typeof vietnameseDays];
+        return `Quán sẽ mở cửa vào lúc ${nextDay.openTime} (${vietnameseDay})`;
       }
     }
   }

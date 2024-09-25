@@ -53,7 +53,7 @@ export class ToastService {
 
   showWarning(message: string) {
     Toast.show({
-      type: "warning",
+      type: "error",
       text1: message,
     });
   }

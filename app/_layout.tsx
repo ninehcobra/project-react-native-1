@@ -28,7 +28,7 @@ import SignInScreen from "./features/auth/presentation/sign_in_screen";
 import SignUpScreen from "./features/auth/presentation/sign_up_screen";
 import OtpScreen from "./features/auth/presentation/otp_screen";
 import Map from "./features/map/presentation/screens/map";
-
+import { LogBox } from "react-native";
 const Tab = createBottomTabNavigator();
 
 SplashScreen.preventAutoHideAsync();
@@ -45,7 +45,8 @@ const Stack = createNativeStackNavigator();
 function RootLayout() {
   const [loaded, error] = useFonts({ Poppins_400Regular });
 
-  console.ignoredYellowBox = ["Warning: Each", "Warning: Failed"];
+  LogBox.ignoreLogs(["Asyncstorage: ..."]); // Ignore log notification by message
+  LogBox.ignoreAllLogs(); //Ignore all log notifications
 
   useEffect(() => {
     if (loaded || error) {

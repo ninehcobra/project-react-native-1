@@ -24,6 +24,7 @@ import { useDispatch, useSelector } from "react-redux";
 import OverView from "./Tabs/OverView";
 import About from "./Tabs/About";
 import { setPreviewImage } from "@/redux/slices/preview-image.slice";
+import Review from "./Tabs/Review";
 
 export default function DetailModal({
   modalVisible,
@@ -263,7 +264,7 @@ export default function DetailModal({
                   ) : value === "overview" ? (
                     <OverView business={business} />
                   ) : (
-                    <Text>Review</Text>
+                    <Review business={business} />
                   )}
                 </View>
               </View>
