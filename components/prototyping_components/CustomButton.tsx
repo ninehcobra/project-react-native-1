@@ -1,4 +1,4 @@
-import { Colors } from "@/constants/Colors";
+import { Colors } from "@/constants/colors";
 import { colorStyles } from "@/styles/color";
 import { typographyStyles } from "@/styles/typography";
 import { TouchableOpacity, View, Text } from "react-native";

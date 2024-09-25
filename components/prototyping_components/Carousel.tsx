@@ -1,4 +1,4 @@
-import { Colors } from "@/constants/Colors";
+import { Colors } from "@/constants/colors";
 import { useRef, useState } from "react";
 import {
   View,

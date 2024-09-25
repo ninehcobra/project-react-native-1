@@ -1,4 +1,4 @@
-import { Colors } from "@/constants/Colors";
+import { Colors } from "@/constants/colors";
 import { View } from "react-native";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
 

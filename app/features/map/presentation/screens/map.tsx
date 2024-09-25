@@ -1,4 +1,3 @@
-import { Colors } from "@/constants/Colors";
 import { ToastService } from "@/services/toast.service";
 import { typographyStyles } from "@/styles/typography";
 import React, { useEffect, useMemo, useRef, useState } from "react";
@@ -38,8 +37,10 @@ import Carousel from "react-native-reanimated-carousel";
 import { useDispatch } from "react-redux";
 import { setSelectedBusiness } from "@/redux/slices/selected-business.slice";
 import SearchModal from "../components/SearchModal";
-
-const mapTypes = ["standard", "satellite", "hybrid", "terrain"];
+import DetailModal from "../components/DetailModal";
+import { Colors } from "@/constants/Colors";
+import { RADIUSOPTIONS } from "@/constants/radius";
+import { MAPTYPES, MAPTYPESLIST } from "@/constants/map";
 
 export default function Map({
   navigation,
@@ -47,8 +48,8 @@ export default function Map({
   navigation: any;
 }): React.ReactNode {
   const [mapType, setMapType] = useState<
-    "standard" | "satellite" | "hybrid" | "terrain"
-  >("terrain");
+    MAPTYPES.HYBRID | MAPTYPES.STANDARD | MAPTYPES.TERRAIN | MAPTYPES.SATELLITE
+  >(MAPTYPES.TERRAIN);
 
   const [currentLocation, setCurrentLocation] = useState<LatLng | null>(null);
 
@@ -66,8 +67,6 @@ export default function Map({
 
   const [searchResult, setSearchResult] = useState<boolean>(false);
 
-  const width = Dimensions.get("window").width;
-
   const dispatch = useDispatch();
 
   const [queryData, setQueryData] = useState<IFindNearByPayLoad>({
@@ -79,8 +78,6 @@ export default function Map({
   });
   const {
     data: searchResponse,
-    isLoading,
-    isFetching,
     isSuccess,
     isError,
     error,
@@ -88,15 +85,6 @@ export default function Map({
   } = useFindNearByQuery(queryData, {
     skip: !isSearching,
   });
-
-  const radiusOptions = [
-    { label: "500m", value: 0.5 },
-    { label: "1km", value: 1 },
-    { label: "2km", value: 2 },
-    { label: "5km", value: 5 },
-    { label: "10km", value: 10 },
-    { label: "20km", value: 20 },
-  ];
 
   const toastService = useMemo<ToastService>(
     () => new ToastService(navigation),
@@ -130,11 +118,9 @@ export default function Map({
 
   const mapRef = useRef<MapView>(null);
   const cycleMapType = () => {
-    const currentIndex = mapTypes.indexOf(mapType);
-    const nextIndex = (currentIndex + 1) % mapTypes.length;
-    setMapType(
-      mapTypes[nextIndex] as "standard" | "satellite" | "hybrid" | "terrain"
-    );
+    const currentIndex = MAPTYPESLIST.indexOf(mapType);
+    const nextIndex = (currentIndex + 1) % MAPTYPESLIST.length;
+    setMapType(MAPTYPESLIST[nextIndex]);
   };
 
   const requestLocationPermission = async () => {
@@ -392,69 +378,11 @@ export default function Map({
         />
       </TouchableOpacity>
 
-      <Modal
-        animationType="slide"
-        transparent={true}
-        visible={modalVisible}
-        onRequestClose={() => setModalVisible(false)}
-      >
-        <View style={styles.modalOverlay}>
-          <View style={styles.modalContent}>
-            {selectedPlace && (
-              <>
-                <View style={{ height: 250 }}>
-                  <Carousel
-                    loop
-                    width={width}
-                    height={250}
-                    autoPlay={true}
-                    data={[...new Array(6).keys()]}
-                    scrollAnimationDuration={1000}
-                    onSnapToItem={(index) =>
-                      console.log("current index:", index)
-                    }
-                    renderItem={({ index }) => (
-                      <View
-                        style={{
-                          flex: 1,
-                          borderWidth: 1,
-                          justifyContent: "center",
-                        }}
-                      >
-                        <Text style={{ textAlign: "center", fontSize: 30 }}>
-                          {index}
-                        </Text>
-                      </View>
-                    )}
-                  />
-                </View>
-                <Text style={styles.modalTitle}>{selectedPlace.name}</Text>
-                <Text style={styles.modalDescription}>
-                  {selectedPlace.description}
-                </Text>
-                <Text style={styles.modalInfo}>
-                  {selectedPlace.fullAddress}
-                </Text>
-                <View style={styles.ratingContainer}>
-                  <AntDesign name="star" size={20} color="#FFD700" />
-                  <Text style={styles.ratingText}>
-                    {selectedPlace.overallRating}
-                  </Text>
-                </View>
-                <Text style={styles.modalInfo}>
-                  Phone: {selectedPlace.phoneNumber}
-                </Text>
-                <TouchableOpacity
-                  style={styles.closeButton}
-                  onPress={() => setModalVisible(false)}
-                >
-                  <AntDesign name="close" size={24} color="white" />
-                </TouchableOpacity>
-              </>
-            )}
-          </View>
-        </View>
-      </Modal>
+      <DetailModal
+        modalVisible={modalVisible}
+        setModalVisible={setModalVisible}
+        selectedPlace={selectedPlace}
+      />
       <View style={styles.radiusSelector}>
         <RNPickerSelect
           onValueChange={(value) => {
@@ -477,7 +405,7 @@ export default function Map({
                   : 200,
             });
           }}
-          items={radiusOptions}
+          items={RADIUSOPTIONS}
           value={selectedRadius}
           style={pickerSelectStyles}
           placeholder={{ label: "Chọn bán kính", value: null }}
