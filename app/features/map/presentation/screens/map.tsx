@@ -26,8 +26,6 @@ import DetailModal from "../components/DetailModal";
 import { RADIUSOPTIONS } from "@/constants/radius";
 import { MAPTYPES, MAPTYPESLIST } from "@/constants/map";
 import { Colors } from "@/constants/colors";
-import { requestLocationPermission } from "@/utils/permission";
-import { getZoomLevel } from "@/utils/zoom";
 
 export default function Map({
   navigation,
@@ -110,6 +108,35 @@ export default function Map({
     setMapType(MAPTYPESLIST[nextIndex]);
   };
 
+  const requestLocationPermission = async () => {
+    if (Platform.OS === "android") {
+      try {
+        if (
+          (await PermissionsAndroid.check(
+            PermissionsAndroid.PERMISSIONS.ACCESS_FINE_LOCATION
+          )) === false
+        ) {
+          const granted = await PermissionsAndroid.request(
+            PermissionsAndroid.PERMISSIONS.ACCESS_FINE_LOCATION,
+            {
+              title: "Location Permission",
+              message: "App needs access to your location",
+              buttonNeutral: "Ask Me Later",
+              buttonNegative: "Cancel",
+              buttonPositive: "OK",
+            }
+          );
+          if (granted === PermissionsAndroid.RESULTS.GRANTED) {
+          } else {
+            toastService.showInfo("Location permission denied");
+          }
+        }
+      } catch (err) {
+        toastService.showInfo("Error requesting location permission");
+      }
+    }
+  };
+
   const getCurrentLocation = async () => {
     setSelectedLocation(null);
     if (currentLocation == null) {
@@ -189,6 +216,10 @@ export default function Map({
         setSearchResult(true);
       }, 1000);
     }
+  };
+
+  const getZoomLevel = (radius: number) => {
+    return Math.log2(360 * (40075017 / (radius * 1000 * 256))) - 1;
   };
 
   const updateMapRegion = (
