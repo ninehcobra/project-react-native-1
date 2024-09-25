@@ -27,7 +27,8 @@ import { PaperProvider } from "react-native-paper";
 import SignInScreen from "./features/auth/presentation/sign_in_screen";
 import SignUpScreen from "./features/auth/presentation/sign_up_screen";
 import OtpScreen from "./features/auth/presentation/otp_screen";
-import Map from "./features/map/presentation/map";
+import Map from "./features/map/presentation/screens/map";
+
 const Tab = createBottomTabNavigator();
 
 SplashScreen.preventAutoHideAsync();
