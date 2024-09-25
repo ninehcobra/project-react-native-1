@@ -2,6 +2,7 @@ import { Colors } from "@/constants/colors";
 import { colorStyles } from "@/styles/color";
 import { typographyStyles } from "@/styles/typography";
 import { IFindNearByResponse } from "@/types/near-by";
+import { getBusinessStatus } from "@/utils/day-of-week";
 import AntDesign from "@expo/vector-icons/build/AntDesign";
 import FontAwesome6 from "@expo/vector-icons/build/FontAwesome6";
 import Ionicons from "@expo/vector-icons/build/Ionicons";
@@ -15,6 +16,7 @@ import {
   ScrollView,
   Image,
 } from "react-native";
+import BusinessCard from "./BusinessCard";
 
 export default function SearchModal({
   setSearchResult,
@@ -45,7 +47,7 @@ export default function SearchModal({
       visible={searchResult}
     >
       <View style={styles.modalOverlay}>
-        <View style={styles.modalContent}>
+        <View style={{ ...styles.modalContent, padding: 12 }}>
           <TouchableOpacity
             style={styles.closeButton}
             onPress={() => setSearchResult(false)}
@@ -159,196 +161,19 @@ export default function SearchModal({
             showsVerticalScrollIndicator={false}
           >
             {searchResponse && searchResponse.data.length > 0 ? (
-              searchResponse.data.map((place) => (
-                <View key={place.id} style={{ marginBottom: 24 }}>
-                  <ScrollView
-                    showsHorizontalScrollIndicator={false}
-                    horizontal={true}
-                  >
-                    {place.images.length > 0 ? (
-                      place.images.map((image) => {
-                        return (
-                          <Image
-                            source={
-                              image.url
-                                ? { uri: image.url }
-                                : require("../../../../../assets/images/default_business.png")
-                            }
-                            defaultSource={require("../../../../../assets/images/default_business.png")}
-                            onError={(error) => {}}
-                            style={{
-                              borderRadius: 12,
-                              width: 165,
-                              height: 165,
-                              marginRight: 12,
-                            }}
-                          />
-                        );
-                      })
-                    ) : (
-                      <Image
-                        source={require("../../../../../assets/images/default_business.png")}
-                        style={{
-                          borderRadius: 12,
-                          width: 165,
-                          height: 165,
-                          marginRight: 12,
-                        }}
-                      />
-                    )}
-                  </ScrollView>
-                  <View style={{ flexDirection: "row" }}>
-                    <View style={{ marginTop: 6, flex: 9 }}>
-                      <Text
-                        style={{
-                          ...typographyStyles.body_L,
-                          fontWeight: "700",
-                        }}
-                      >
-                        {place.name}
-                      </Text>
-                      <View
-                        style={{
-                          flexDirection: "row",
-                          alignItems: "center",
-                        }}
-                      >
-                        <Text
-                          style={{
-                            ...typographyStyles.body_M,
-                            ...colorStyles.neutralColorDark_3,
-                          }}
-                        >
-                          {place.overallRating.toFixed(1)}
-                        </Text>
-
-                        <View
-                          style={{
-                            marginLeft: 4,
-                            marginBottom: 4,
-                            flexDirection: "row",
-                          }}
-                        >
-                          {[1, 2, 3, 4, 5].map((index) => {
-                            const starValue = place.overallRating - index + 1;
-                            if (starValue >= 1) {
-                              return (
-                                <MaterialIcons
-                                  key={index}
-                                  name="star"
-                                  size={18}
-                                  color={Colors.support.warningColor_1}
-                                />
-                              );
-                            } else if (starValue > 0) {
-                              return (
-                                <MaterialIcons
-                                  key={index}
-                                  name="star-half"
-                                  size={18}
-                                  color={Colors.support.warningColor_1}
-                                />
-                              );
-                            } else {
-                              return (
-                                <MaterialIcons
-                                  key={index}
-                                  name="star-outline"
-                                  size={18}
-                                  color={Colors.support.warningColor_1}
-                                />
-                              );
-                            }
-                          })}
-                        </View>
-
-                        <Text
-                          style={{
-                            ...typographyStyles.body_M,
-                            ...colorStyles.neutralColorDark_3,
-                            marginLeft: 4,
-                          }}
-                        >{`(${place.totalReview}) . `}</Text>
-                        <Text
-                          style={{
-                            ...typographyStyles.body_M,
-                            ...colorStyles.neutralColorDark_3,
-                            marginLeft: 4,
-                          }}
-                        >{`${(place._distance / 1000).toFixed(1)} km`}</Text>
-                      </View>
-
-                      <Text
-                        style={{
-                          ...typographyStyles.body_M,
-                          ...colorStyles.neutralColorDark_3,
-                        }}
-                      >
-                        {place.category.name}
-                      </Text>
-
-                      <View
-                        style={{
-                          flexDirection: "row",
-                          alignItems: "center",
-                        }}
-                      >
-                        <Text
-                          style={{
-                            ...typographyStyles.body_M,
-                            ...colorStyles.supportColorSuccess_1,
-                          }}
-                        >
-                          Đang mở cửa .
-                        </Text>
-                        <Text
-                          style={{
-                            ...typographyStyles.body_M,
-                            marginLeft: 4,
-                          }}
-                        >
-                          Đóng cửa lúc 20:30
-                        </Text>
-                      </View>
-                    </View>
-                    <View
-                      style={{
-                        flex: 2,
-                      }}
-                    >
-                      <TouchableOpacity
-                        onPress={() =>
-                          onFlyTo({
-                            latitude: place.location.coordinates[1],
-                            longitude: place.location.coordinates[0],
-                            latitudeDelta: 0.005,
-                            longitudeDelta: 0.005,
-                          })
-                        }
-                      >
-                        <View
-                          style={{
-                            height: 50,
-                            width: 50,
-                            borderRadius: 50,
-                            borderColor: Colors.dark.neutralColor_5,
-                            borderWidth: 1,
-                            marginTop: 12,
-                            alignItems: "center",
-                            justifyContent: "center",
-                          }}
-                        >
-                          <FontAwesome6
-                            name="diamond-turn-right"
-                            size={24}
-                            color={Colors.highlight.highlightColor_1}
-                          />
-                        </View>
-                      </TouchableOpacity>
-                    </View>
-                  </View>
-                </View>
-              ))
+              searchResponse.data.map((place) => {
+                const [status, nextTime] = getBusinessStatus({
+                  dayOfWeek: [...place.dayOfWeek],
+                });
+                return (
+                  <BusinessCard
+                    place={place}
+                    status={status}
+                    nextTime={nextTime}
+                    onFlyTo={onFlyTo}
+                  />
+                );
+              })
             ) : (
               <View>
                 <Image
