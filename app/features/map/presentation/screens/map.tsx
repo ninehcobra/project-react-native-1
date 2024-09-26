@@ -225,7 +225,18 @@ export default function Map({
       setTimeout(() => {
         setIsGetData(false);
       }, 500);
+
+      handleOnClose();
     }
+  };
+
+  const handleOnClose = (): void => {
+    dispatch(
+      setSelectedBusiness({
+        selectedBusinessId: null,
+        selectedBusinessData: null,
+      })
+    );
   };
 
   const getZoomLevel = (radius: number) => {

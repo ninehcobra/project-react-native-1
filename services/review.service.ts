@@ -10,10 +10,16 @@ import {
   IReplyReply,
   IReview,
 } from "@/types/review";
+import { getToken } from "@/utils/jwt";
 
 export const reviewApi = createApi({
   reducerPath: "reviewApi",
-  baseQuery: fetchBaseQuery({ baseUrl: "http://10.0.2.2:8080" }),
+  baseQuery: fetchBaseQuery({
+    baseUrl: "http://10.0.2.2:8080",
+    headers: {
+      Authorization: `Bearer ${getToken()}`,
+    },
+  }),
   tagTypes: ["ReviewList", "NearBy"],
   endpoints: (builder) => ({
     getReviewsForBusiness: builder.query<

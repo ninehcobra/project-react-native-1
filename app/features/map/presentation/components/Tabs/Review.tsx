@@ -9,15 +9,14 @@ import { useEffect, useState } from "react";
 import { Image } from "react-native";
 import { View, Text, TouchableOpacity } from "react-native";
 import moment from "moment";
-import "moment/locale/vi";
 import ReviewModal from "../ReviewModal";
+import { ErrorResponse } from "@/types/error";
+import { navigate } from "@/services/navigation.service";
 export default function Review({
   business,
 }: {
   business: IBusiness;
 }): React.ReactNode {
-  moment.locale("vi");
-
   const [sortBy, setSortBy] = useState<string>("desc");
   const { data, isLoading, isFetching, error, isError, isSuccess } =
     useGetReviewsForBusinessQuery({
@@ -27,6 +26,14 @@ export default function Review({
 
   const reviewList: IReview[] | undefined = data?.data;
   const [isReviewModalVisible, setIsReviewModalVisible] = useState(false);
+
+  useEffect(() => {
+    if (isSuccess) {
+      setSortBy("desc");
+    }
+    if (isError) {
+    }
+  }, [isSuccess]);
 
   const openReviewModal = () => {
     setIsReviewModalVisible(true);
@@ -149,7 +156,10 @@ export default function Review({
         </View>
       ) : (
         <View
-          style={{ flex: 1, alignItems: "center", justifyContent: "center" }}
+          style={{
+            marginTop: 80,
+            alignItems: "center",
+          }}
         >
           <Text>Chưa có đánh giá</Text>
         </View>

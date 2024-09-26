@@ -29,6 +29,7 @@ import SignUpScreen from "./features/auth/presentation/sign_up_screen";
 import OtpScreen from "./features/auth/presentation/otp_screen";
 import Map from "./features/map/presentation/screens/map";
 import { LogBox } from "react-native";
+import { navigationRef } from "@/services/navigation.service";
 const Tab = createBottomTabNavigator();
 
 SplashScreen.preventAutoHideAsync();
@@ -61,10 +62,10 @@ function RootLayout() {
     <SafeAreaProvider>
       <Provider store={store}>
         <PaperProvider>
-          <NavigationContainer independent={true}>
+          <NavigationContainer ref={navigationRef} independent={true}>
             <Stack.Navigator
               screenOptions={{ headerShown: false }}
-              initialRouteName="map"
+              initialRouteName="sign_in"
             >
               <Stack.Screen
                 name="news"

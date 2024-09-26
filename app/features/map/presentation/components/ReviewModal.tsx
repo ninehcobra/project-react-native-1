@@ -13,6 +13,7 @@ import { typographyStyles } from "@/styles/typography";
 import { useCreateReviewMutation } from "@/services/review.service";
 import { ToastService } from "@/services/toast.service";
 import { ErrorResponse } from "@/types/error";
+import { navigate } from "@/services/navigation.service";
 
 interface ReviewModalProps {
   isVisible: boolean;
@@ -55,9 +56,16 @@ export default function ReviewModal({
       console.log(data);
     }
     if (isError) {
-      toastService.showWarning("Chưa đăng nhập");
+      handleError(error as ErrorResponse);
     }
   }, [isSuccess, isError]);
+
+  const handleError = (error: ErrorResponse) => {
+    if (error.data && error.data.statusCode === 401) {
+      toastService.showWarning("Bạn cần đăng nhập để thực hiện hành động này.");
+      navigate("sign_in");
+    }
+  };
 
   return (
     <Modal
