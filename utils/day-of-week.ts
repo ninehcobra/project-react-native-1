@@ -5,6 +5,16 @@ interface BusinessHours {
   dayOfWeek: IDayOfWeek[];
 }
 
+const vietnameseDays = {
+  monday: "thứ hai",
+  tuesday: "thứ ba",
+  wednesday: "thứ tư",
+  thursday: "thứ năm",
+  friday: "thứ sáu",
+  saturday: "thứ bảy",
+  sunday: "chủ nhật",
+};
+
 export const getBusinessStatus = (
   businessHours: BusinessHours
 ): [string, string] => {
@@ -17,7 +27,8 @@ export const getBusinessStatus = (
   }
 
   const todaySchedule = businessHours.dayOfWeek.find(
-    (day) => day.day === currentDay
+    (day) =>
+      vietnameseDays[day.day as keyof typeof vietnameseDays] === currentDay
   );
 
   if (!todaySchedule) {
