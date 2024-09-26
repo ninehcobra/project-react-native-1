@@ -26,9 +26,20 @@ export default function OverView({
 }: {
   business: IBusiness;
 }): React.ReactNode {
-  const [status, nextTime] = getBusinessStatus({
-    dayOfWeek: business.dayOfWeek,
-  });
+  let status = "Không có thông tin";
+  let nextTime = "";
+
+  if (business && business.dayOfWeek) {
+    try {
+      [status, nextTime] = getBusinessStatus({
+        dayOfWeek: business.dayOfWeek,
+      });
+    } catch (error) {
+      console.error("Error getting business status:", error);
+      status = "Lỗi khi lấy thông tin";
+      nextTime = "";
+    }
+  }
 
   const dispatch = useDispatch();
   const handleOnOpenPreviewImage = (image: ImageSourcePropType): void => {

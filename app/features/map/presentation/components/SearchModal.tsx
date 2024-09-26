@@ -167,6 +167,7 @@ export default function SearchModal({
                 });
                 return (
                   <BusinessCard
+                    key={place.id}
                     place={place}
                     status={status}
                     nextTime={nextTime}
