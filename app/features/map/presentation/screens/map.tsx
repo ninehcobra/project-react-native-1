@@ -57,6 +57,8 @@ export default function Map({
 
   const [searchResult, setSearchResult] = useState<boolean>(false);
 
+  const [isGetData, setIsGetData] = useState<boolean>(false);
+
   const dispatch = useDispatch();
 
   const handleOnClosePreviewImage = (value: boolean): void => {
@@ -218,9 +220,11 @@ export default function Map({
         selectedLocation.longitude,
         selectedRadius
       );
+      setSearchResult(true);
+      setIsGetData(true);
       setTimeout(() => {
-        setSearchResult(true);
-      }, 1000);
+        setIsGetData(false);
+      }, 500);
     }
   };
 
@@ -399,6 +403,7 @@ export default function Map({
       </View>
 
       <SearchModal
+        isGetData={isGetData}
         setSearchResult={setSearchResult}
         searchResult={searchResult}
         searchResponse={searchResponse}

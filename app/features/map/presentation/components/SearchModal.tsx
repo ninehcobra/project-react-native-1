@@ -15,6 +15,7 @@ import {
   Text,
   ScrollView,
   Image,
+  ActivityIndicator,
 } from "react-native";
 import BusinessCard from "./BusinessCard";
 
@@ -23,6 +24,7 @@ export default function SearchModal({
   searchResult,
   searchResponse,
   onFlyTo,
+  isGetData,
 }: {
   setSearchResult: (value: boolean) => void;
   searchResult: boolean;
@@ -38,6 +40,7 @@ export default function SearchModal({
     latitudeDelta: number;
     longitudeDelta: number;
   }): void;
+  isGetData: boolean;
 }): React.ReactNode {
   return (
     <Modal
@@ -160,7 +163,16 @@ export default function SearchModal({
             showsHorizontalScrollIndicator={false}
             showsVerticalScrollIndicator={false}
           >
-            {searchResponse && searchResponse.data.length > 0 ? (
+            {isGetData ? (
+              <View style={{ alignItems: "center" }}>
+                <ActivityIndicator
+                  size="large"
+                  style={{ marginTop: 120 }}
+                  color={Colors.highlight.highlightColor_1}
+                />
+                <Text style={{ marginTop: 4 }}>Đang tải</Text>
+              </View>
+            ) : searchResponse && searchResponse.data.length > 0 ? (
               searchResponse.data.map((place) => {
                 const [status, nextTime] = getBusinessStatus({
                   dayOfWeek: [...place.dayOfWeek],
