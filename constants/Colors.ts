@@ -29,7 +29,7 @@ export const Colors = {
     successColor_1: "#298267",
     successColor_2: "#3AC0A0",
     successColor_3: "#E7F4E8",
-    warningColor_1: "#E86339",
+    warningColor_1: "#FBBC04",
     warningColor_2: "#FFB37C",
     warningColor_3: "#FFFAE4",
     errorColor_1: "#ED3241",
