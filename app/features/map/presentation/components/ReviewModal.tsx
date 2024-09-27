@@ -33,14 +33,12 @@ export default function ReviewModal({
 
   const handleSubmit = async () => {
     try {
-      console.log("submit");
       await createReview({
         content,
         star: rating.toString(),
         businessId,
         emotion: "excellent",
       }).unwrap();
-      onClose();
     } catch (error) {
       console.error("Failed to submit review:", error);
     }
@@ -53,7 +51,10 @@ export default function ReviewModal({
 
   useEffect(() => {
     if (isSuccess) {
-      console.log(data);
+      toastService.showSuccess("Review submitted successfully");
+      setContent("");
+      setRating(0);
+      onClose();
     }
     if (isError) {
       handleError(error as ErrorResponse);
@@ -61,9 +62,21 @@ export default function ReviewModal({
   }, [isSuccess, isError]);
 
   const handleError = (error: ErrorResponse) => {
-    if (error.data && error.data.statusCode === 401) {
-      toastService.showWarning("Bạn cần đăng nhập để thực hiện hành động này.");
-      navigate("sign_in");
+    if (error.data && error.data.statusCode) {
+      switch (error.data.statusCode) {
+        case 401:
+          navigate("sign_in");
+          toastService.showWarning(
+            "Bạn cần đăng nhập để thực hiện hành động này."
+          );
+          break;
+        case 404:
+          toastService.showWarning("Không tìm thấy dữ liệu");
+          break;
+        default:
+          toastService.showWarning("Đã xảy ra lỗi");
+          break;
+      }
     }
   };
 

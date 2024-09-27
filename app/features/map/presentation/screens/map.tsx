@@ -33,6 +33,7 @@ import {
   setPreviewImage,
 } from "@/redux/slices/preview-image.slice";
 import ImagePreviewModal from "../components/ImagePreviewModal";
+import { getToken } from "@/utils/jwt";
 
 export default function Map({
   navigation,
@@ -59,6 +60,12 @@ export default function Map({
 
   const [isGetData, setIsGetData] = useState<boolean>(false);
 
+  const [searchData, setSearchData] = useState<string>("");
+
+  const [isHighRating, setIsHighRating] = useState<boolean>(false);
+
+  const [isNearest, setIsNearest] = useState<boolean>(false);
+
   const dispatch = useDispatch();
 
   const handleOnClosePreviewImage = (value: boolean): void => {
@@ -75,6 +82,8 @@ export default function Map({
     radius: selectedRadius,
     q: "",
     limit: 200,
+    isHighRating: isHighRating,
+    isNearest: isNearest,
   });
   const {
     data: searchResponse,
@@ -214,6 +223,9 @@ export default function Map({
         ...queryData,
         latitude: selectedLocation.latitude,
         longitude: selectedLocation.longitude,
+        q: searchData,
+        isHighRating: isHighRating,
+        isNearest: isNearest,
       });
       updateMapRegion(
         selectedLocation.latitude,
@@ -274,6 +286,10 @@ export default function Map({
 
     setModalVisible(true);
   };
+
+  useEffect(() => {
+    handleOnSearch();
+  }, [isNearest, isHighRating]);
 
   return (
     <View style={styles.container}>
@@ -351,14 +367,27 @@ export default function Map({
       </TouchableOpacity>
       <View style={styles.searchbar}>
         <TextInput
+          value={searchData}
           placeholder="Tìm kiếm..."
           mode="outlined"
           outlineStyle={{ borderRadius: 24 }}
           style={{ ...typographyStyles.body_M, paddingHorizontal: 12 }}
-          right={<TextInput.Icon icon="magnify" />}
+          right={<TextInput.Icon onPress={handleOnSearch} icon="magnify" />}
+          onChange={(event) => {
+            setSearchData(event.nativeEvent.text);
+          }}
         ></TextInput>
       </View>
-
+      <TouchableOpacity
+        style={{ ...styles.floatingButton, right: 20, top: 20 }}
+        onPress={getToken}
+      >
+        <MaterialIcons
+          name={"location-on"}
+          size={20}
+          color={Colors.light.neutralColor_5}
+        />
+      </TouchableOpacity>
       <TouchableOpacity
         style={{ ...styles.floatingButton, left: 20, bottom: 20 }}
         onPress={getCurrentLocation}
@@ -419,6 +448,10 @@ export default function Map({
         searchResult={searchResult}
         searchResponse={searchResponse}
         onFlyTo={onFlyTo}
+        isHighRating={isHighRating}
+        isNearest={isNearest}
+        setIsHighRating={setIsHighRating}
+        setIsNearest={setIsNearest}
       />
 
       <ImagePreviewModal
@@ -451,7 +484,7 @@ const styles = StyleSheet.create({
   },
   searchbar: {
     position: "absolute",
-    top: 20,
+    top: 54,
     left: 0,
     width: "100%",
     padding: 12,

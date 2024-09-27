@@ -7,7 +7,7 @@ import { ToastService } from "@/services/toast.service";
 import { colorStyles } from "@/styles/color";
 import { typographyStyles } from "@/styles/typography";
 import { ErrorResponse } from "@/types/error";
-import { storeToken } from "@/utils/jwt";
+import { getToken, storeToken } from "@/utils/jwt";
 import { useEffect, useMemo, useState } from "react";
 import { View, Text, TouchableOpacity, ImageBackground } from "react-native";
 import { TextInput } from "react-native-paper";
@@ -123,6 +123,18 @@ export default function SignInScreen({
       [inputType]: "",
     }));
   };
+
+  const checkAuth = async () => {
+    const token = await getToken();
+
+    if (token) {
+      navigation.navigate("map");
+    }
+  };
+
+  useEffect(() => {
+    checkAuth();
+  }, []);
 
   return (
     <ContainerWrapper>

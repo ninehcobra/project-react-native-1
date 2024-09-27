@@ -10,11 +10,13 @@ export const storeToken = async (token: string) => {
 };
 
 // Lấy token
-export const getToken = async () => {
+export const getToken = async (): Promise<string | null> => {
   try {
-    return await AsyncStorage.getItem("jwt_token");
+    const token = await AsyncStorage.getItem("jwt_token");
+    return token;
   } catch (error) {
     console.error("Error retrieving token", error);
+    return null;
   }
 };
 

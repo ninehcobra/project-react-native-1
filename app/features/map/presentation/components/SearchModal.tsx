@@ -25,6 +25,10 @@ export default function SearchModal({
   searchResponse,
   onFlyTo,
   isGetData,
+  isHighRating,
+  isNearest,
+  setIsHighRating,
+  setIsNearest,
 }: {
   setSearchResult: (value: boolean) => void;
   searchResult: boolean;
@@ -41,6 +45,10 @@ export default function SearchModal({
     longitudeDelta: number;
   }): void;
   isGetData: boolean;
+  isHighRating: boolean;
+  isNearest: boolean;
+  setIsHighRating: (value: boolean) => void;
+  setIsNearest: (value: boolean) => void;
 }): React.ReactNode {
   return (
     <Modal
@@ -97,62 +105,60 @@ export default function SearchModal({
               horizontal={true}
               showsHorizontalScrollIndicator={false}
             >
-              <View
-                style={{
-                  paddingVertical: 4,
-                  paddingHorizontal: 8,
-                  borderColor: Colors.dark.neutralColor_5,
-                  borderWidth: 1,
-                  borderRadius: 10,
-                }}
-              >
-                <Text
+              <TouchableOpacity onPress={() => setIsHighRating(!isHighRating)}>
+                <View
                   style={{
-                    ...typographyStyles.body_L,
-                    fontWeight: "700",
+                    paddingVertical: 4,
+                    paddingHorizontal: 8,
+                    borderColor: Colors.dark.neutralColor_5,
+                    borderWidth: 1,
+                    borderRadius: 10,
+                    marginLeft: 12,
+                    backgroundColor: isHighRating
+                      ? Colors.highlight.highlightColor_1
+                      : "transparent",
                   }}
                 >
-                  Hiện đang mở
-                </Text>
-              </View>
-              <View
-                style={{
-                  paddingVertical: 4,
-                  paddingHorizontal: 8,
-                  borderColor: Colors.dark.neutralColor_5,
-                  borderWidth: 1,
-                  borderRadius: 10,
-                  marginLeft: 12,
-                }}
-              >
-                <Text
+                  <Text
+                    style={{
+                      ...typographyStyles.body_L,
+                      fontWeight: "700",
+                      color: isHighRating
+                        ? Colors.light.neutralColor_5
+                        : Colors.dark.neutralColor_1,
+                    }}
+                  >
+                    Được xếp hạng cao nhất
+                  </Text>
+                </View>
+              </TouchableOpacity>
+              <TouchableOpacity onPress={() => setIsNearest(!isNearest)}>
+                <View
                   style={{
-                    ...typographyStyles.body_L,
-                    fontWeight: "700",
+                    paddingVertical: 4,
+                    paddingHorizontal: 8,
+                    borderColor: Colors.dark.neutralColor_5,
+                    borderWidth: 1,
+                    borderRadius: 10,
+                    marginLeft: 12,
+                    backgroundColor: isNearest
+                      ? Colors.highlight.highlightColor_1
+                      : "transparent",
                   }}
                 >
-                  Được xếp hạng cao nhất
-                </Text>
-              </View>
-              <View
-                style={{
-                  paddingVertical: 4,
-                  paddingHorizontal: 8,
-                  borderColor: Colors.dark.neutralColor_5,
-                  borderWidth: 1,
-                  borderRadius: 10,
-                  marginLeft: 12,
-                }}
-              >
-                <Text
-                  style={{
-                    ...typographyStyles.body_L,
-                    fontWeight: "700",
-                  }}
-                >
-                  Gần đây nhất
-                </Text>
-              </View>
+                  <Text
+                    style={{
+                      ...typographyStyles.body_L,
+                      fontWeight: "700",
+                      color: isNearest
+                        ? Colors.light.neutralColor_5
+                        : Colors.dark.neutralColor_1,
+                    }}
+                  >
+                    Gần đây nhất
+                  </Text>
+                </View>
+              </TouchableOpacity>
             </ScrollView>
           </View>
           <ScrollView

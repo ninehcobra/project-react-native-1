@@ -16,8 +16,14 @@ export const reviewApi = createApi({
   reducerPath: "reviewApi",
   baseQuery: fetchBaseQuery({
     baseUrl: "http://10.0.2.2:8080",
-    headers: {
-      Authorization: `Bearer ${getToken()}`,
+    prepareHeaders: async (headers) => {
+      const token = await getToken();
+      if (token) {
+        headers.set("Authorization", `Bearer ${token}`);
+        headers.set("Content-Type", "application/json");
+        headers.set("Accept", "application/json");
+      }
+      return headers;
     },
   }),
   tagTypes: ["ReviewList", "NearBy"],
